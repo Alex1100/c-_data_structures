@@ -51,19 +51,19 @@ public:
   void printStack() const
   {
     // Forward (Normal)
-    copy(
-      begin(this->Items),
-      end(this->Items),
-      ostream_iterator<string>(cout, "\n")
-    );
+    for (int i = sizeof(this->Items) / sizeof(this->Items[0]); i >= 0; i--) {
+        cout << this->Items[i] << "\n";
+    }
   }
 
   void printStackInReverse() const
   {
     // Reversed
-    for (int i = sizeof(this->Items) / sizeof(this->Items[0]); i >= 0; i--) {
-        cout << this->Items[i] << "\n";
-    }
+    copy(
+      begin(this->Items),
+      end(this->Items),
+      ostream_iterator<string>(cout, "\n")
+    );
   }
 
   int getStackItemCount() const
