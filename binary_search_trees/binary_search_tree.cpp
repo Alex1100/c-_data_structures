@@ -9,93 +9,80 @@ struct node {
   node *right;
 };
 
-class Queue
-{
-public:
-  void enqueue(int item)
-  {
-    cout << "ITEMS ARE: " << this->Items[0] << endl;
-    this->Items.push_back(item);
-    setQueueSize(this->QueueSize + 1);
-  }
-
-  int dequeue()
-  {
-    int removed = this->Items[0];
-    this->Items.erase(this->Items.begin(), this->Items.begin() + 1);
-    return removed;
-  }
-
-  int front() const
-  {
-    return this->Items[0];
-  }
-
-  int back() const
-  {
-    return this->Items[this->QueueSize - 1];
-  }
-
-  bool contains(int item) const
-  {
-    for (int i = 0; i < sizeof(this->Items) / sizeof(this->Items[0]); ++i)
-    {
-      if (this->Items[i] == item)
-      {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  bool isEmpty()
-  {
-    return this->Items.empty();
-  }
-
-    void printQueue() const
-  {
-    // Forward (Normal)
-    copy(
-      begin(this->Items),
-      end(this->Items),
-      ostream_iterator<int>(cout, "\n")
-    );
-  }
-
-  int getQueueSize() const
-  {
-    if (this->Items.empty())
-    {
-      return 0;
-    }
-
-    return this->QueueSize;
-  }
-
-  void setQueueSize(int newSize)
-  {
-    this->QueueSize = newSize;
-  }
-
+/**************************************
+ * @class Queue
+ * @desc  Implements Queue
+ *************************************/
+template <class T>
+class Queue{
 private:
-  vector<int> Items;
-  int QueueSize;
+  int front, rear, max;
+  T *q;
+public:
+  Queue(int size=0){
+    front = rear = 0;
+    max = size;
+    q = new T[size];
+  }
+  ~Queue(){
+    delete []q;
+  }
+  int enqueue(T);
+  T dequeue();
+  T printQueue();
+  T getItemAt(int index);
 };
+
+
+template <class T>
+int Queue<T>::enqueue(T elem){
+  if(front>=max){
+    return -2;
+  }
+  q[front] = elem; front++;
+}
+
+template <class T>
+T Queue<T>::dequeue(){
+  if(front<=0){
+    return -1;
+  }
+  T result = q[rear];
+  ++rear;
+  return result;
+
+}
+
+template <class T>
+T Queue<T>::printQueue(){
+  for (int i = 0; i < front; ++i){
+    cout << q[i] << endl;
+  }
+}
+
+template <class T>
+T Queue<T>::getItemAt(int index){
+  if (index <= max) {
+    return q[index];
+  }
+
+  return -1;
+}
+//End Class
 
 class btree{
 public:
   btree();
   ~btree();
 
+  int getBTreeSize();
   void insert(int key);
   node *search(int key);
   void destroy_tree();
   void inorder_print();
   void postorder_print();
   void preorder_print();
-  Queue *breadth_first_search(Queue *queue);
+  void breadth_first_search(Queue<int> *myQueue);
 
 private:
   void setBTreeSize(int newSize);
@@ -105,7 +92,7 @@ private:
   void inorder_print(node *leaf);
   void postorder_print(node *leaf);
   void preorder_print(node *leaf);
-  Queue *breadth_first_search(node *leaf, Queue *queue);
+  void breadth_first_search(node *leaf, Queue<int> *myQueue);
 
   node *root;
   int BTreeSize;
@@ -118,6 +105,10 @@ btree::btree(){
 
 btree::~btree(){
   destroy_tree();
+}
+
+int btree::getBTreeSize(){
+  return BTreeSize;
 }
 
 void btree::destroy_tree(node *leaf){
@@ -233,22 +224,18 @@ void btree::preorder_print(node *leaf){
   }
 }
 
-Queue *btree::breadth_first_search(Queue *queue){
-  return breadth_first_search(root, queue);
+void btree::breadth_first_search(Queue<int> *myQueue){
+  return breadth_first_search(root, myQueue);
 }
 
-Queue *btree::breadth_first_search(node *leaf, Queue *queue){
+void btree::breadth_first_search(node *leaf, Queue<int> *myQueue){
   vector<node> current;
   current.reserve(this->BTreeSize);
   current.push_back(*leaf);
-    cout << "DOESN'T BREAK HERE:: " << endl;
 
   while (current.size() > 0) {
-    cout << "DOESN'T BREAK HERE:: " << endl;
     vector<node> next;
-    cout << "DOESN'T BREAK HERE:: " << endl;
-    queue->enqueue(current[0].value);
-    cout << "BREAKS HERE:: " << endl;
+    myQueue->enqueue(current[0].value);
 
     if (current[0].left){
       next.resize(1, *current[0].left);
@@ -259,55 +246,54 @@ Queue *btree::breadth_first_search(node *leaf, Queue *queue){
     }
 
     for(int i = 1; i < current.size(); i++){
-      cout << "BREAKS HERE:: " << endl;
-
-      queue->enqueue(current[i].value);
+      myQueue->enqueue(current[i].value);
 
       if(current[i].left){
-        cout << "SIZE BEFORE RESIZE IS: " << next.size() << endl;
         next.resize(next.size() + 1, *current[i].left);
-        cout << "SIZE AFTER RESIZE IS: " << next.size() << endl;
       }
 
       if(current[i].right){
         next.resize(next.size() + 1, *current[i].right);
       }
-      queue->printQueue();
     }
-    cout << "BREAKS HERE:: " << endl;
 
-    int add_size = next.size();
-    vector<node> new_current;
-    new_current.reserve(next.size());
-    new_current = next;
-    current = new_current;
+    if (next.size() != 0) {
+      int add_size = next.size();
+      vector<node> new_current;
+      new_current.reserve(next.size());
+      new_current = next;
+      current = new_current;
+    } else {
+      current.clear();
+    }
   }
-
-  return queue;
 }
 
-int main(){
+int main(void){
 
   //btree tree;
   btree *tree = new btree();
 
   tree->insert(10);
   tree->insert(6);
-  tree->insert(14);
-  tree->insert(5);
-  tree->insert(8);
   tree->insert(11);
   tree->insert(18);
+  tree->insert(8);
+  tree->insert(5);
+  tree->insert(14);
 
   tree->preorder_print();
   tree->inorder_print();
   tree->postorder_print();
-  Queue *myQueue = new Queue();
-  cout << "DOESN'T BREAK HERE:: " << endl;
-  myQueue = tree->breadth_first_search(myQueue);
-  cout << "\n\nYO MY QUEUE AT END IS: " << endl;
-  cout << "\nQUEUE ITEM #1 IS: " << myQueue->dequeue() << endl;
-  myQueue->printQueue();
-  // tree->~btree();
-  // tree = NULL;
+
+  Queue<int> myQueue(tree->getBTreeSize());
+  tree->breadth_first_search(&myQueue);
+
+  cout << "\nBFS: " << endl;
+  myQueue.printQueue();
+
+  tree->~btree();
+  tree = NULL;
+
+  return 0;
 }
