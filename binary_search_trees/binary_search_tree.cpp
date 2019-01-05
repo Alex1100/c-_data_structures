@@ -70,6 +70,11 @@ T Queue<T>::getItemAt(int index){
 }
 //End Class
 
+
+/**************************************
+ * @class btree
+ * @desc  Implements btree
+ *************************************/
 class btree{
 public:
   btree();
@@ -267,7 +272,9 @@ void btree::breadth_first_search(node *leaf, Queue<int> *myQueue){
       current.clear();
     }
   }
-}
+};
+//End Class
+
 
 int main(void){
   btree *tree = new btree();
