@@ -270,8 +270,6 @@ void btree::breadth_first_search(node *leaf, Queue<int> *myQueue){
 }
 
 int main(void){
-
-  //btree tree;
   btree *tree = new btree();
 
   tree->insert(10);
