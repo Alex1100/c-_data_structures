@@ -161,6 +161,7 @@ public:
   void preorder_print();
   void breadth_first_search(Queue<int> *myQueue);
   void depth_first_search(Stack<int> *myStack, string order);
+  bool is_valid_bst();
 
 private:
   void setBTreeSize(int newSize);
@@ -172,6 +173,7 @@ private:
   void preorder_print(node *leaf);
   void breadth_first_search(node *leaf, Queue<int> *myQueue);
   void depth_first_search(node *leaf, Stack<int> *myStack, string order);
+  bool is_valid_bst(node *leaf, int min, int max);
 
   node *root;
   int BTreeSize;
@@ -350,7 +352,7 @@ void btree::breadth_first_search(node *leaf, Queue<int> *myQueue){
 
 void btree::depth_first_search(Stack<int> *myStack, string order){
   return btree::depth_first_search(root, myStack, order);
-};
+}
 
 void btree::depth_first_search(node *leaf, Stack<int> *myStack, string order){
   if (order == "pre_order") {
@@ -383,7 +385,23 @@ void btree::depth_first_search(node *leaf, Stack<int> *myStack, string order){
 
     myStack->insert(leaf->value);
   }
-};
+}
+
+bool btree::is_valid_bst() {
+  return is_valid_bst(root, INT_MIN, INT_MAX);
+}
+
+bool btree::is_valid_bst(node *leaf, int min, int max) {
+  if (leaf != NULL){
+    return true;
+  }
+
+  if (leaf->value < min || leaf->value > max) {
+    return false;
+  }
+
+  return (is_valid_bst(leaf->left, min, leaf->value - 1) && is_valid_bst(leaf->right, leaf->value + 1, max));
+}
 //End Class
 
 
@@ -412,6 +430,7 @@ int main(void){
   cout << "\nDFS: " << endl;
   myStack.printStack();
   cout << "STACK IS EMPTY??: " << myStack.isEmpty() << endl;
+  cout << "IS TREE VALID BST??:: " << tree->is_valid_bst() << endl;
   tree->~btree();
   tree = NULL;
 
