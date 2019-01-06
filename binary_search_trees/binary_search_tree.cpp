@@ -72,6 +72,78 @@ T Queue<T>::getItemAt(int index){
 
 
 /**************************************
+ * @class Stack
+ * @desc  Implements Stack
+ *************************************/
+template <class T>
+class Stack{
+private:
+  int front, rear, max;
+  T *s;
+public:
+  Stack(int size=0){
+    front = rear = 0;
+    max = size;
+    s = new T[size];
+  }
+
+  ~Stack(){
+    delete []s;
+  }
+
+  int insert(T);
+  T pop();
+  T printStack();
+  T getItemAt(int index);
+  bool isEmpty();
+};
+
+template <class T>
+int Stack<T>::insert(T item){
+  if (rear >= max) {
+    return -2;
+  }
+  s[rear] = item;
+  rear++;
+}
+
+template <class T>
+T Stack<T>::pop(){
+  if(rear<=0){
+    return -1;
+  }
+  T result = s[rear - 1];
+  --rear;
+  return result;
+}
+
+template <class T>
+T Stack<T>::printStack(){
+  for (int i = 0; i < rear; ++i){
+    cout << s[i] << endl;
+  }
+}
+
+template <class T>
+T Stack<T>::getItemAt(int index){
+  if (index < rear) {
+    return s[index];
+  }
+
+  return -1;
+}
+
+template <class T>
+bool Stack<T>::isEmpty(){
+  if (rear <= 0) {
+    return true;
+  }
+
+  return false;
+}
+// End Class
+
+/**************************************
  * @class btree
  * @desc  Implements btree
  *************************************/
@@ -88,6 +160,7 @@ public:
   void postorder_print();
   void preorder_print();
   void breadth_first_search(Queue<int> *myQueue);
+  void depth_first_search(Stack<int> *myStack, string order);
 
 private:
   void setBTreeSize(int newSize);
@@ -98,6 +171,7 @@ private:
   void postorder_print(node *leaf);
   void preorder_print(node *leaf);
   void breadth_first_search(node *leaf, Queue<int> *myQueue);
+  void depth_first_search(node *leaf, Stack<int> *myStack, string order);
 
   node *root;
   int BTreeSize;
@@ -272,6 +346,43 @@ void btree::breadth_first_search(node *leaf, Queue<int> *myQueue){
       current.clear();
     }
   }
+}
+
+void btree::depth_first_search(Stack<int> *myStack, string order){
+  return btree::depth_first_search(root, myStack, order);
+};
+
+void btree::depth_first_search(node *leaf, Stack<int> *myStack, string order){
+  if (order == "pre_order") {
+    myStack->insert(leaf->value);
+    if (leaf->left) {
+      depth_first_search(leaf->left, myStack, order);
+    }
+
+    if (leaf->right) {
+      depth_first_search(leaf->right, myStack, order);
+    }
+  } else if (order == "in_order") {
+    if (leaf->left) {
+      depth_first_search(leaf->left, myStack, order);
+    }
+
+    myStack->insert(leaf->value);
+
+    if (leaf->right) {
+      depth_first_search(leaf->right, myStack, order);
+    }
+  } else if (order == "post_order") {
+    if (leaf->left) {
+      depth_first_search(leaf->left, myStack, order);
+    }
+
+    if (leaf->right) {
+      depth_first_search(leaf->right, myStack, order);
+    }
+
+    myStack->insert(leaf->value);
+  }
 };
 //End Class
 
@@ -296,7 +407,11 @@ int main(void){
 
   cout << "\nBFS: " << endl;
   myQueue.printQueue();
-
+  Stack<int> myStack(tree->getBTreeSize());
+  tree->depth_first_search(&myStack, "in_order");
+  cout << "\nDFS: " << endl;
+  myStack.printStack();
+  cout << "STACK IS EMPTY??: " << myStack.isEmpty() << endl;
   tree->~btree();
   tree = NULL;
 
