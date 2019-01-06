@@ -223,7 +223,6 @@ void btree::insert(int key, node *leaf){
       setBTreeSize(this->BTreeSize + 1);
     }
   }
-
 }
 
 void btree::insert(int key){
@@ -402,6 +401,8 @@ bool btree::is_valid_bst(node *leaf, int min, int max) {
 
   return (is_valid_bst(leaf->left, min, leaf->value - 1) && is_valid_bst(leaf->right, leaf->value + 1, max));
 }
+
+
 //End Class
 
 
