@@ -24,6 +24,7 @@ public:
   }
   void add_node(T val);
   node<T> *get_head();
+  bool contains(T val);
 };
 
 template <class T>
@@ -49,6 +50,32 @@ void LinkedList<T>::add_node(T val){
 }
 
 template <class T>
+bool LinkedList<T>::contains(T val) {
+  if (this->size == 0) {
+    return false;
+  }
+
+  if (this->size == 1) {
+    if (val == this->head->data) {
+      return true;
+    }
+
+    return false;
+  }
+
+  node<T> *current_node = this->head;
+
+  while(current_node->next != NULL) {
+    current_node = current_node->next;
+    if (current_node->data == val) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+template <class T>
 node<T> *LinkedList<T>::get_head() {
   return this->head;
 }
@@ -58,4 +85,6 @@ int main(void) {
   LinkedList<int> linked_list;
   linked_list.add_node(10);
   cout << "LINKED LIST HEAD IS: " << linked_list.get_head()->data << endl;
+  cout << "CONTAINS 20?:: " << linked_list.contains(20) << endl;
+  cout << "CONTAINS 10?:: " << linked_list.contains(10) << endl;
 }
