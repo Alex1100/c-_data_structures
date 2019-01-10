@@ -162,6 +162,7 @@ public:
   void breadth_first_search(Queue<int> *myQueue);
   void depth_first_search(Stack<int> *myStack, string order);
   bool is_valid_bst();
+  int find_min();
 
 private:
   void setBTreeSize(int newSize);
@@ -174,6 +175,7 @@ private:
   void breadth_first_search(node *leaf, Queue<int> *myQueue);
   void depth_first_search(node *leaf, Stack<int> *myStack, string order);
   bool is_valid_bst(node *leaf, int min, int max);
+  int find_min(node *leaf, int min);
 
   node *root;
   int BTreeSize;
@@ -402,6 +404,24 @@ bool btree::is_valid_bst(node *leaf, int min, int max) {
   return (is_valid_bst(leaf->left, min, leaf->value - 1) && is_valid_bst(leaf->right, leaf->value + 1, max));
 }
 
+int btree::find_min() {
+  return find_min(root, INT_MAX);
+}
+
+int btree::find_min(node *leaf, int min) {
+  if (leaf == NULL) {
+    return -1;
+  }
+
+  node *current_leaf = leaf;
+
+  while(current_leaf != NULL) {
+    min = current_leaf->value;
+    current_leaf = current_leaf->left;
+  }
+
+  return min;
+}
 
 //End Class
 
@@ -432,6 +452,7 @@ int main(void){
   myStack.printStack();
   cout << "STACK IS EMPTY??: " << myStack.isEmpty() << endl;
   cout << "IS TREE VALID BST??:: " << tree->is_valid_bst() << endl;
+  cout << "MIN IN TREE IS: " << tree->find_min() << endl;
   tree->~btree();
   tree = NULL;
 
