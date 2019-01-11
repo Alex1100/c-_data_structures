@@ -462,19 +462,23 @@ int main(void){
   tree->inorder_print();
   tree->postorder_print();
 
-  Queue<int> myQueue(tree->getBTreeSize());
-  tree->breadth_first_search(&myQueue);
+  Queue<int> *myQueue = new Queue<int>(tree->getBTreeSize());
+  tree->breadth_first_search(myQueue);
 
   cout << "\nBFS: " << endl;
-  myQueue.printQueue();
-  Stack<int> myStack(tree->getBTreeSize());
-  tree->depth_first_search(&myStack, "in_order");
+  myQueue->printQueue();
+  Stack<int> *myStack = new Stack<int>(tree->getBTreeSize());
+  tree->depth_first_search(myStack, "in_order");
   cout << "\nDFS: " << endl;
-  myStack.printStack();
-  cout << "STACK IS EMPTY??: " << myStack.isEmpty() << endl;
+  myStack->printStack();
+  cout << "STACK IS EMPTY??: " << myStack->isEmpty() << endl;
   cout << "IS TREE VALID BST??:: " << tree->is_valid_bst() << endl;
   cout << "MIN IN TREE IS: " << tree->find_min() << endl;
   cout << "MAX IN TREE IS: " << tree->find_max() << endl;
+  myQueue->~Queue();
+  myQueue = NULL;
+  myStack->~Stack();
+  myStack = NULL;
   tree->~btree();
   tree = NULL;
 

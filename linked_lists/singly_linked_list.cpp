@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
@@ -21,7 +20,18 @@ public:
     head = new node<T>();
     tail = head;
     size = 0;
-  }
+  };
+  ~LinkedList() {
+    node<T> *current_node = this->head;
+    node<T> *prev_node;
+    while(current_node != this->tail) {
+      prev_node = current_node;
+      current_node = current_node->next;
+      delete prev_node;
+    }
+
+    delete this->tail;
+  };
   void add_node(T val);
   node<T> *get_head();
   node<T> *get_tail();
@@ -153,4 +163,6 @@ int main(void) {
   }
 
   cout << "TAIL IS: " << linked_list.get_tail()->data << endl;
+  linked_list.~LinkedList();
+  linked_list = NULL;
 }

@@ -85,6 +85,6 @@ int main(void){
     cout << "AND UP NEXT: " << myStack.pop() << endl;
     cout << "AND UP NEXT: " << myStack.pop() << endl;
     cout << "AND UP NEXT: " << myStack.pop() << endl;
-
+    myStack.~Stack();
     return 0;
 }
