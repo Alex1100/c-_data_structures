@@ -24,6 +24,7 @@ public:
   }
   void add_node(T val);
   node<T> *get_head();
+  node<T> *get_tail();
   bool contains(T val);
   node<T> *remove_node(T val);
 };
@@ -83,12 +84,17 @@ node<T> *LinkedList<T>::get_head() {
 }
 
 template <class T>
+node<T> *LinkedList<T>::get_tail() {
+  return this->tail;
+}
+
+template <class T>
 node<T> *LinkedList<T>::remove_node(T val) {
   if (this->size == 0) {
-    return nullptr;
+    throw "Empty List";
   }
 
-  node<T> *removed_node;
+  node<T> *removed_node = NULL;
 
   if (this->head->data == val) {
     removed_node = this->head;
@@ -111,11 +117,15 @@ node<T> *LinkedList<T>::remove_node(T val) {
     if (current_node->data == val) {
       removed_node = current_node;
       prev_node->next = current_node->next;
+      if (removed_node == this->tail) {
+        prev_node->next = NULL;
+        this->tail = prev_node;
+      }
     }
   }
 
   if (removed_node == NULL) {
-    this->tail = current_node;
+    throw "Node does not exist";
   }
 
   return removed_node;
@@ -134,6 +144,13 @@ int main(void) {
   cout << "LINKED LIST HEAD IS: " << linked_list.get_head()->data << endl;
   cout << "CONTAINS 20?:: " << linked_list.contains(20) << endl;
   cout << "CONTAINS 10?:: " << linked_list.contains(10) << endl;
-  node<int> *deleted_node = linked_list.remove_node(60);
-  cout << "NODE REMOVED IS: " << deleted_node->data << endl;
+  node<int> *deleted_node = linked_list.remove_node(70);
+  try {
+    node<int> *additional_deleted_node = linked_list.remove_node(90);
+    cout << "NODE REMOVED IS: " << additional_deleted_node->data << endl;
+  } catch (const char* msg) {
+    cout << "ERROR REMOVING NODE:: " << msg << endl;
+  }
+
+  cout << "TAIL IS: " << linked_list.get_tail()->data << endl;
 }
