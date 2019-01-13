@@ -3,6 +3,10 @@
 using namespace std;
 
 
+/**************************************
+ * @class LinkedList
+ * @desc  Implements LinkedList
+ *************************************/
 template <class T>
 struct node{
   T data;
