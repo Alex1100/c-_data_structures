@@ -45,12 +45,18 @@ public:
 
     delete this->tail;
   };
+  int get_size();
   void add_node(T key, E val);
   node<T, E> *get_head();
   node<T, E> *get_tail();
   bool contains(T key);
   node<T, E> *remove_node(T key);
 };
+
+template <class T, class E>
+int LinkedList<T, E>::get_size() {
+  return size;
+}
 
 template <class T, class E>
 void LinkedList<T, E>::add_node(T key, E val){
@@ -215,7 +221,7 @@ int HashTable<T, E>::hash(T key) {
     converted_key = key;
   }
 
-  for (int i = 0; i < (sizeof(converted_key) / sizeof(converted_key[0])); i++) {
+  for (int i = 0; i < converted_key.length(); i++) {
     hashed_base = (hashed_base << 5) + hashed_base + int(converted_key[i]);
     hashed_base = hashed_base & hashed_base;
     hashed_base = abs(hashed_base << hash_salt);
@@ -233,9 +239,10 @@ int main(void) {
   HashTable<string, int> *myHashTable = new HashTable<string, int>(10);
   cout << "HASH TABLE SIZE IS: " << myHashTable->get_size() << endl;
   myHashTable->insert("cloth", 100);
-  LinkedList<string, int> *myStorage = myHashTable->get_bucket(6);
+  LinkedList<string, int> *myStorage = myHashTable->get_bucket(myHashTable->hash("cloth"));
   cout << "HASH TABLE ITEM ENTERED KEY SHOULD BE: " << myStorage->get_head()->data.key << endl;
   cout << "HASH TABLE ITEM ENTERED VALUE SHOULD BE: " << myStorage->get_head()->data.value << endl;
-
+  myHashTable->~HashTable();
+  myHashTable = NULL;
   return 0;
 }
