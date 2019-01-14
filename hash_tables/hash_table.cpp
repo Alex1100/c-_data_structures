@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <typeinfo>
+#include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -163,7 +166,7 @@ class HashTable {
 private:
   LinkedList<T, E> *storage;
   int front, rear, size;
-  static int hash_salt = 11021992;
+  const int hash_salt = {11021992};
 public:
   HashTable(int initial_size) {
     front = 0;
@@ -178,7 +181,7 @@ public:
   void insert(T key, E val);
   LinkedList<T, E> get_bucket(int hash_key_index);
   int hash(T key);
-  int hash(string key);
+  bool is_int(T key);
 };
 
 template <class T, class E>
@@ -188,8 +191,8 @@ int HashTable<T, E>::get_size() {
 
 template <class T, class E>
 void HashTable<T, E>::insert(T key, E val) {
-  cout << "NEEDS TO BE IMPLEMENTED: " << endl;
-  // storage[0].add_node(val);
+  int storage_index = hash(key);
+  storage[storage_index].add_node(key, val);
 }
 
 template <class T, class E>
@@ -200,33 +203,39 @@ LinkedList<T, E> HashTable<T, E>::get_bucket(int hash_key_index) {
 template <class T, class E>
 int HashTable<T, E>::hash(T key) {
   int hashed_base = 0;
+  stringstream ss;
+  string converted_key;
 
-  hashed_base = key << 5;
-  hashed_base = hashed_base & hashed_base;
-  hashed_base = abs(hashed_base >> hash_salt);
+  if (is_int(key)) {
+    ss.str("");
+    ss.clear();
+    ss << key;
+    converted_key = ss.str();
+  } else {
+    converted_key = key;
+  }
 
-  return hashed_base % this->get_size();
-}
-
-int HashTable<string, string>::hash(string key) {
-  int hashed_base = 0;
-
-  for (int i = 0; i < (sizeof(key) / sizeof(key[0])); i++) {
-    hashed_base = (hashed_base << 5) + hashed_base + int(key[i]);
+  for (int i = 0; i < (sizeof(converted_key) / sizeof(converted_key[0])); i++) {
+    hashed_base = (hashed_base << 5) + hashed_base + int(converted_key[i]);
     hashed_base = hashed_base & hashed_base;
     hashed_base = abs(hashed_base << hash_salt);
   }
 
   return hashed_base % this->get_size();
 }
-//work in progress :)
+
+template <class T, class E>
+bool HashTable<T, E>::is_int(T key) {
+  return (typeid(int) == typeid(key));
+}
 
 int main(void) {
   HashTable<string, int> *myHashTable = new HashTable<string, int>(10);
   cout << "HASH TABLE SIZE IS: " << myHashTable->get_size() << endl;
-  myHashTable->insert("Hi", 100);
-  LinkedList<string, int> myStorage = myHashTable->get_bucket(0);
-  cout << "HASH TABLE ITEM SHOULD BE: " << myStorage.get_head()->data.key << endl;
+  myHashTable->insert("cloth", 100);
+  LinkedList<string, int> myStorage = myHashTable->get_bucket(6);
+  cout << "HASH TABLE ITEM ENTERED KEY SHOULD BE: " << myStorage.get_head()->data.key << endl;
+  cout << "HASH TABLE ITEM ENTERED VALUE SHOULD BE: " << myStorage.get_head()->data.value << endl;
 
   return 0;
 }
