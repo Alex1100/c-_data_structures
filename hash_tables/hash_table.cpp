@@ -179,7 +179,7 @@ public:
   }
   int get_size();
   void insert(T key, E val);
-  LinkedList<T, E> get_bucket(int hash_key_index);
+  LinkedList<T, E> *get_bucket(int hash_key_index);
   int hash(T key);
   bool is_int(T key);
 };
@@ -196,8 +196,8 @@ void HashTable<T, E>::insert(T key, E val) {
 }
 
 template <class T, class E>
-LinkedList<T, E> HashTable<T, E>::get_bucket(int hash_key_index) {
-  return storage[hash_key_index];
+LinkedList<T, E> *HashTable<T, E>::get_bucket(int hash_key_index) {
+  return &storage[hash_key_index];
 }
 
 template <class T, class E>
@@ -233,9 +233,9 @@ int main(void) {
   HashTable<string, int> *myHashTable = new HashTable<string, int>(10);
   cout << "HASH TABLE SIZE IS: " << myHashTable->get_size() << endl;
   myHashTable->insert("cloth", 100);
-  LinkedList<string, int> myStorage = myHashTable->get_bucket(6);
-  cout << "HASH TABLE ITEM ENTERED KEY SHOULD BE: " << myStorage.get_head()->data.key << endl;
-  cout << "HASH TABLE ITEM ENTERED VALUE SHOULD BE: " << myStorage.get_head()->data.value << endl;
+  LinkedList<string, int> *myStorage = myHashTable->get_bucket(6);
+  cout << "HASH TABLE ITEM ENTERED KEY SHOULD BE: " << myStorage->get_head()->data.key << endl;
+  cout << "HASH TABLE ITEM ENTERED VALUE SHOULD BE: " << myStorage->get_head()->data.value << endl;
 
   return 0;
 }
