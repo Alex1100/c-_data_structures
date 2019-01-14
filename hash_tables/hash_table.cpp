@@ -3,31 +3,37 @@
 
 using namespace std;
 
-template <class T>
+template <class T, class E>
+struct node_data{
+  T key;
+  E value;
+};
+
+template <class T, class E>
 struct node{
-  T data;
-  node<T> *next;
+  node_data<T, E> data;
+  node<T, E> *next;
 };
 
 /**************************************
  * @class LinkedList
  * @desc  Implements LinkedList
  *************************************/
-template <class T>
+template <class T, class E>
 class LinkedList {
 private:
-  node<T> *head;
-  node<T> *tail;
+  node<T, E> *head;
+  node<T, E> *tail;
   int size;
 public:
   LinkedList() {
-    head = new node<T>();
+    head = new node<T, E>();
     tail = head;
     size = 0;
   };
   ~LinkedList() {
-    node<T> *current_node = this->head;
-    node<T> *prev_node;
+    node<T, E> *current_node = this->head;
+    node<T, E> *prev_node;
     while(current_node != this->tail) {
       prev_node = current_node;
       current_node = current_node->next;
@@ -36,55 +42,58 @@ public:
 
     delete this->tail;
   };
-  void add_node(T val);
-  node<T> *get_head();
-  node<T> *get_tail();
-  bool contains(T val);
-  node<T> *remove_node(T val);
+  void add_node(T key, E val);
+  node<T, E> *get_head();
+  node<T, E> *get_tail();
+  bool contains(T key);
+  node<T, E> *remove_node(T key);
 };
 
-template <class T>
-void LinkedList<T>::add_node(T val){
+template <class T, class E>
+void LinkedList<T, E>::add_node(T key, E val){
   if (this->size == 0) {
-    node<T> *new_node = new node<T>();
-    new_node->data = val;
+    node<T, E> *new_node = new node<T, E>();
+    new_node->data.key = key;
+    new_node->data.value = val;
 
     this->head = new_node;
     this->tail = new_node;
     this->size++;
   } else {
-    node<T> *current_node = this->head;
+    node<T, E> *current_node = this->head;
 
     while(current_node->next != NULL) {
       current_node = current_node->next;
     }
 
-    current_node->next = new node<T>();
-    current_node->next->data = val;
+    current_node->next = new node<T, E>();
+    current_node->next->data.key = key;
+    current_node->next->data.value = val;
+
     this->tail = current_node->next;
     this->size++;
   }
 }
 
-template <class T>
-bool LinkedList<T>::contains(T val) {
+template <class T, class E>
+bool LinkedList<T, E>::contains(T key) {
   if (this->size == 0) {
     return false;
   }
 
   if (this->size == 1) {
-    if (val == this->head->data) {
+    if (key == this->head->data.key) {
       return true;
     }
 
     return false;
   }
 
-  node<T> *current_node = this->head;
+  node<T, E> *current_node = this->head;
 
   while(current_node->next != NULL) {
     current_node = current_node->next;
-    if (current_node->data == val) {
+    if (current_node->data.key == key) {
       return true;
     }
   }
@@ -92,25 +101,25 @@ bool LinkedList<T>::contains(T val) {
   return false;
 }
 
-template <class T>
-node<T> *LinkedList<T>::get_head() {
+template <class T, class E>
+node<T, E> *LinkedList<T, E>::get_head() {
   return this->head;
 }
 
-template <class T>
-node<T> *LinkedList<T>::get_tail() {
+template <class T, class E>
+node<T, E> *LinkedList<T, E>::get_tail() {
   return this->tail;
 }
 
-template <class T>
-node<T> *LinkedList<T>::remove_node(T val) {
+template <class T, class E>
+node<T, E> *LinkedList<T, E>::remove_node(T key) {
   if (this->size == 0) {
     throw "Empty List";
   }
 
-  node<T> *removed_node = NULL;
+  node<T, E> *removed_node = NULL;
 
-  if (this->head->data == val) {
+  if (this->head->data.key == key) {
     removed_node = this->head;
     this->head = this->head->next;
 
@@ -121,14 +130,14 @@ node<T> *LinkedList<T>::remove_node(T val) {
     return removed_node;
   }
 
-  node<T> *current_node = this->head;
-  node<T> *prev_node;
+  node<T, E> *current_node = this->head;
+  node<T, E> *prev_node;
 
   while(current_node->next != NULL) {
     prev_node = current_node;
     current_node = current_node->next;
 
-    if (current_node->data == val) {
+    if (current_node->data.key == key) {
       removed_node = current_node;
       prev_node->next = current_node->next;
       if (removed_node == this->tail) {
@@ -149,47 +158,75 @@ node<T> *LinkedList<T>::remove_node(T val) {
  * @class HashTable
  * @desc  Implements HashTable
  *************************************/
-template <class T>
+template <class T, class E>
 class HashTable {
 private:
-  LinkedList<T> *storage;
+  LinkedList<T, E> *storage;
   int front, rear, size;
+  static int hash_salt = 11021992;
 public:
   HashTable(int initial_size) {
     front = 0;
     rear = initial_size - 1;
     size = initial_size;
-    storage = new LinkedList<T>[size];
+    storage = new LinkedList<T, E>[size];
   }
   ~HashTable(){
     delete []storage;
   }
   int get_size();
-  void add_to_ht(T val);
-  LinkedList<T> get_bucket(int hash_key_index);
+  void insert(T key, E val);
+  LinkedList<T, E> get_bucket(int hash_key_index);
+  int hash(T key);
+  int hash(string key);
 };
 
-template <class T>
-int HashTable<T>::get_size() {
+template <class T, class E>
+int HashTable<T, E>::get_size() {
   return size;
 }
 
-template <class T>
-void HashTable<T>::add_to_ht(T val) {
-  storage[0].add_node(val);
+template <class T, class E>
+void HashTable<T, E>::insert(T key, E val) {
+  cout << "NEEDS TO BE IMPLEMENTED: " << endl;
+  // storage[0].add_node(val);
 }
 
-template <class T>
-LinkedList<T> HashTable<T>::get_bucket(int hash_key_index) {
+template <class T, class E>
+LinkedList<T, E> HashTable<T, E>::get_bucket(int hash_key_index) {
   return storage[hash_key_index];
+}
+
+template <class T, class E>
+int HashTable<T, E>::hash(T key) {
+  int hashed_base = 0;
+
+  hashed_base = key << 5;
+  hashed_base = hashed_base & hashed_base;
+  hashed_base = abs(hashed_base >> hash_salt);
+
+  return hashed_base % this->get_size();
+}
+
+int HashTable<string, string>::hash(string key) {
+  int hashed_base = 0;
+
+  for (int i = 0; i < (sizeof(key) / sizeof(key[0])); i++) {
+    hashed_base = (hashed_base << 5) + hashed_base + int(key[i]);
+    hashed_base = hashed_base & hashed_base;
+    hashed_base = abs(hashed_base << hash_salt);
+  }
+
+  return hashed_base % this->get_size();
 }
 //work in progress :)
 
 int main(void) {
-  HashTable<string> *myHashTable = new HashTable<string>(10);
+  HashTable<string, int> *myHashTable = new HashTable<string, int>(10);
   cout << "HASH TABLE SIZE IS: " << myHashTable->get_size() << endl;
-  myHashTable->add_to_ht("Hi");
-  LinkedList<string> myStorage = myHashTable->get_bucket(0);
-  cout << "HASH TABLE ITEM SHOULD BE: " << myStorage.get_head()->data << endl;
+  myHashTable->insert("Hi", 100);
+  LinkedList<string, int> myStorage = myHashTable->get_bucket(0);
+  cout << "HASH TABLE ITEM SHOULD BE: " << myStorage.get_head()->data.key << endl;
+
   return 0;
 }
