@@ -91,21 +91,13 @@ bool LinkedList<T, E>::contains(T key) {
     return false;
   }
 
-  if (this->size == 1) {
-    if (key == this->head->data.key) {
-      return true;
-    }
-
-    return false;
-  }
-
   node<T, E> *current_node = this->head;
 
   while(current_node->next != NULL) {
-    current_node = current_node->next;
     if (current_node->data.key == key) {
       return true;
     }
+    current_node = current_node->next;
   }
 
   return false;
@@ -189,11 +181,12 @@ public:
   }
   int get_size();
   int get_storage_limit();
+  int hash(T key);
   void insert(T key, E val);
   node<T, E> *remove(T key);
   LinkedList<T, E> *get_bucket(int hash_key_index);
-  int hash(T key);
   bool is_int(T key);
+  bool contains(T key);
 };
 
 template <class T, class E>
@@ -339,9 +332,6 @@ node<T, E> *HashTable<T, E>::remove(T key) {
   }
 
   if (storage[storage_index].contains(key)) {
-    cout << "YOO: " << hash("cloth") << endl;
-    cout << "STORAGE_LIMIT IS: " << get_storage_limit() << endl;
-    cout << "SIZE IS: " << storage[storage_index].get_size() << endl;
     size--;
     return storage[storage_index].remove_node(key);
   } else {
@@ -383,6 +373,20 @@ bool HashTable<T, E>::is_int(T key) {
   return (typeid(int) == typeid(key));
 }
 
+template <class T, class E>
+bool HashTable<T, E>::contains(T key) {
+  int storage_index = hash(key);
+  if (
+      storage_index > storage_limit
+      || !storage[storage_index].get_size()
+      || !storage[storage_index].contains(key)
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 int main(void) {
   HashTable<string, int> *myHashTable = new HashTable<string, int>(10);
   cout << "HASH TABLE SIZE IS: " << myHashTable->get_size() << endl;
@@ -419,6 +423,9 @@ int main(void) {
   } catch (const char* msg) {
     cout << msg << endl;
   }
+
+  cout << "HT CONTAINS `cloth`?: " << myHashTable->contains("cloth") << endl;
+  cout << "HT CONTAINS `yloth`?: " << myHashTable->contains("yloth") << endl;
 
   myHashTable->~HashTable();
   myHashTable = NULL;
