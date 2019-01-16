@@ -253,11 +253,11 @@ void HashTable<T, E>::expand() {
 
 template <class T, class E>
 void HashTable<T, E>::insert(T key, E val) {
-  int storage_index = hash(key);
   if (size == floor(storage_limit * 0.625)) {
     expand();
   }
 
+  int storage_index = hash(key);
 
   if (!storage[storage_index].get_size()) {
     storage[storage_index].add_node(key, val);
@@ -306,7 +306,7 @@ void HashTable<T, E>::shrink() {
     }
   }
 
-  size_t newSize = storage_limit % 2 == 0 ? storage_limit / 2 : (storage_limit / 2) + 1;
+  size_t newSize = floor(storage_limit / 2);
   LinkedList<T, E> *new_storage = new LinkedList<T, E>[newSize];
 
   memcpy(new_storage, storage, storage_limit * sizeof(LinkedList<T, E>));
@@ -328,32 +328,22 @@ void HashTable<T, E>::shrink() {
 
 template <class T, class E>
 node<T, E> *HashTable<T, E>::remove(T key) {
-  int storage_index = hash(key);
   if (size <= floor(storage_limit * 0.4)) {
     shrink();
   }
+
+  int storage_index = hash(key);
 
   if (storage_index > storage_limit) {
     throw "Key does not exist";
   }
 
-  node<T, E> *target;
-  bool complete = false;
-  node<T, E> *current_node = storage[storage_index].get_head();
-
-  while(current_node != NULL || !complete) {
-    if (current_node->data.key == key) {
-      target = current_node;
-      complete = true;
-    } else {
-      current_node = current_node->next;
-    }
-  }
-
-  if (target) {
-    node<T, E> *removed_node = storage[storage_index].remove_node(target->data.key);
+  if (storage[storage_index].contains(key)) {
+    cout << "YOO: " << hash("cloth") << endl;
+    cout << "STORAGE_LIMIT IS: " << get_storage_limit() << endl;
+    cout << "SIZE IS: " << storage[storage_index].get_size() << endl;
     size--;
-    return removed_node;
+    return storage[storage_index].remove_node(key);
   } else {
     throw "Key does not exist";
   }
@@ -400,6 +390,7 @@ int main(void) {
   myHashTable->insert("cloth", 200);
   myHashTable->insert("cloth", 300);
   myHashTable->insert("cloth", 400);
+  cout << myHashTable->hash("cloth") << endl;
   myHashTable->insert("cloths", 200);
   myHashTable->insert("aloth", 300);
   myHashTable->insert("bloth", 600);
@@ -407,6 +398,8 @@ int main(void) {
   myHashTable->insert("rloth", 600);
   myHashTable->insert("tloth", 220);
   cout << "\n" << endl;
+  cout << myHashTable->hash("cloth") << endl;
+
   myHashTable->insert("yloth", 330);
   myHashTable->insert("uloth", 440);
   myHashTable->insert("troth", 225);
@@ -416,7 +409,17 @@ int main(void) {
   LinkedList<string, int> *myStorage = myHashTable->get_bucket(myHashTable->hash("cloth"));
   cout << "HASH TABLE ITEM ENTERED KEY SHOULD BE: " << myStorage->get_head()->data.key << endl;
   cout << "HASH TABLE ITEM ENTERED VALUE SHOULD BE: " << myStorage->get_head()->data.value << endl;
-  myHashTable->remove("cloth");
+
+  cout << myHashTable->hash("cloth") << endl;
+
+  try {
+    auto removedData = myHashTable->remove("cloth")->data;
+    cout << "REMOVED KEY IS: " << removedData.key << endl;
+    cout << "REMOVED VAL IS: " << removedData.value << endl;
+  } catch (const char* msg) {
+    cout << msg << endl;
+  }
+
   myHashTable->~HashTable();
   myHashTable = NULL;
   return 0;
