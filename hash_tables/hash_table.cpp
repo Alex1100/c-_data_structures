@@ -3,6 +3,7 @@
 #include <typeinfo>
 #include <string>
 #include <sstream>
+#include <math.h>
 
 using namespace std;
 
@@ -171,20 +172,25 @@ template <class T, class E>
 class HashTable {
 private:
   LinkedList<T, E> *storage;
-  int front, rear, size;
+  int front, rear, size, storage_limit;
   const int hash_salt = {11021992};
+  void expand();
+  void shrink();
 public:
   HashTable(int initial_size) {
     front = 0;
     rear = initial_size - 1;
-    size = initial_size;
-    storage = new LinkedList<T, E>[size];
+    size = 0;
+    storage_limit = initial_size;
+    storage = new LinkedList<T, E>[storage_limit];
   }
   ~HashTable(){
     delete []storage;
   }
   int get_size();
+  int get_storage_limit();
   void insert(T key, E val);
+  node<T, E> *remove(T key);
   LinkedList<T, E> *get_bucket(int hash_key_index);
   int hash(T key);
   bool is_int(T key);
@@ -196,9 +202,161 @@ int HashTable<T, E>::get_size() {
 }
 
 template <class T, class E>
+int HashTable<T, E>::get_storage_limit() {
+  return storage_limit;
+}
+
+template <class T, class E>
+void HashTable<T, E>::expand() {
+  int all_item_count = 0;
+  int temp_vals_rear = 0;
+
+  for (int i = 0; i < storage_limit; i++) {
+    if (storage[i].get_size() > 0) {
+      all_item_count += storage[i].get_size();
+    }
+  }
+
+  node<T, E> *temp_vals = new node<T, E>[all_item_count];
+
+  for (int j = 0; j < storage_limit; j++) {
+    if (storage[j].get_size()) {
+      node<T, E> *current_node = storage[j].get_head();
+
+      while(current_node != NULL) {
+        temp_vals[temp_vals_rear] = *(current_node);
+        temp_vals_rear++;
+        current_node = current_node->next;
+      }
+    }
+  }
+
+  size_t newSize = storage_limit * 2;
+  LinkedList<T, E> *new_storage = new LinkedList<T, E>[newSize];
+
+  memcpy(new_storage, storage, storage_limit * sizeof(LinkedList<T, E>));
+
+  storage_limit = newSize;
+  delete []storage;
+  storage = new_storage;
+
+  for (int s = 0; s < storage_limit; s++) {
+    storage[s] = *(new LinkedList<T, E>());
+  }
+
+  size = 0;
+
+  for (int v = 0; v < temp_vals_rear; v++) {
+    insert(temp_vals[v].data.key, temp_vals[v].data.value);
+  }
+}
+
+template <class T, class E>
 void HashTable<T, E>::insert(T key, E val) {
   int storage_index = hash(key);
+  if (size == floor(storage_limit * 0.625)) {
+    expand();
+  }
+
+
+  if (!storage[storage_index].get_size()) {
+    storage[storage_index].add_node(key, val);
+    size++;
+    return;
+  }
+
+  bool complete = false;
+  node<T, E> *current_node = storage[storage_index].get_head();
+
+  while(current_node != NULL && !complete) {
+    if (current_node->data.key == key) {
+      current_node->data.value = val;
+      complete = true;
+      return;
+    }
+    current_node = current_node->next;
+  }
+
   storage[storage_index].add_node(key, val);
+  size++;
+}
+
+template <class T, class E>
+void HashTable<T, E>::shrink() {
+  int all_item_count = 0;
+  int temp_vals_rear = 0;
+
+  for (int i = 0; i < storage_limit; i++) {
+    if (storage[i].get_size() > 0) {
+      all_item_count += storage[i].get_size();
+    }
+  }
+
+  node<T, E> *temp_vals = new node<T, E>[all_item_count];
+
+  for (int j = 0; j < storage_limit; j++) {
+    if (storage[j].get_size()) {
+      node<T, E> *current_node = storage[j].get_head();
+
+      while(current_node != NULL) {
+        temp_vals[temp_vals_rear] = *(current_node);
+        temp_vals_rear++;
+        current_node = current_node->next;
+      }
+    }
+  }
+
+  size_t newSize = storage_limit % 2 == 0 ? storage_limit / 2 : (storage_limit / 2) + 1;
+  LinkedList<T, E> *new_storage = new LinkedList<T, E>[newSize];
+
+  memcpy(new_storage, storage, storage_limit * sizeof(LinkedList<T, E>));
+
+  storage_limit = newSize;
+  delete []storage;
+  storage = new_storage;
+
+  for (int s = 0; s < storage_limit; s++) {
+    storage[s] = *(new LinkedList<T, E>());
+  }
+
+  size = 0;
+
+  for (int v = 0; v < temp_vals_rear; v++) {
+    insert(temp_vals[v].data.key, temp_vals[v].data.value);
+  }
+}
+
+template <class T, class E>
+node<T, E> *HashTable<T, E>::remove(T key) {
+  int storage_index = hash(key);
+  if (size <= floor(storage_limit * 0.4)) {
+    shrink();
+  }
+
+  if (storage_index > storage_limit) {
+    throw "Key does not exist";
+  }
+
+  node<T, E> *target;
+  bool complete = false;
+  node<T, E> *current_node = storage[storage_index].get_head();
+
+  while(current_node != NULL || !complete) {
+    if (current_node->data.key == key) {
+      target = current_node;
+      complete = true;
+    } else {
+      current_node = current_node->next;
+    }
+  }
+
+  if (target) {
+    node<T, E> *removed_node = storage[storage_index].remove_node(target->data.key);
+    size--;
+    return removed_node;
+  } else {
+    throw "Key does not exist";
+  }
 }
 
 template <class T, class E>
@@ -227,7 +385,7 @@ int HashTable<T, E>::hash(T key) {
     hashed_base = abs(hashed_base << hash_salt);
   }
 
-  return hashed_base % this->get_size();
+  return hashed_base % this->get_storage_limit();
 }
 
 template <class T, class E>
@@ -239,9 +397,26 @@ int main(void) {
   HashTable<string, int> *myHashTable = new HashTable<string, int>(10);
   cout << "HASH TABLE SIZE IS: " << myHashTable->get_size() << endl;
   myHashTable->insert("cloth", 100);
+  myHashTable->insert("cloth", 200);
+  myHashTable->insert("cloth", 300);
+  myHashTable->insert("cloth", 400);
+  myHashTable->insert("cloths", 200);
+  myHashTable->insert("aloth", 300);
+  myHashTable->insert("bloth", 600);
+  myHashTable->insert("xloth", 500);
+  myHashTable->insert("rloth", 600);
+  myHashTable->insert("tloth", 220);
+  cout << "\n" << endl;
+  myHashTable->insert("yloth", 330);
+  myHashTable->insert("uloth", 440);
+  myHashTable->insert("troth", 225);
+  myHashTable->insert("yqoth", 335);
+  myHashTable->insert("ufoth", 445);
+  myHashTable->insert("ufarh", 745);
   LinkedList<string, int> *myStorage = myHashTable->get_bucket(myHashTable->hash("cloth"));
   cout << "HASH TABLE ITEM ENTERED KEY SHOULD BE: " << myStorage->get_head()->data.key << endl;
   cout << "HASH TABLE ITEM ENTERED VALUE SHOULD BE: " << myStorage->get_head()->data.value << endl;
+  myHashTable->remove("cloth");
   myHashTable->~HashTable();
   myHashTable = NULL;
   return 0;
