@@ -9,15 +9,15 @@ using namespace std;
 
 
 template <class T, class E>
-struct vertex{
+struct vertex_data{
   int weight;
   int heuristic;
 }
 
 template <class T, class E>
-struct vertex_node{
+struct vertex{
   T key;
-  vertex *value;
+  vertex_data *value;
 };
 
 template <class T, class E>
