@@ -7,10 +7,23 @@
 
 using namespace std;
 
+
+template <class T, class E>
+struct vertex{
+  int weight;
+  int heuristic;
+}
+
+template <class T, class E>
+struct vertex_node{
+  T key;
+  vertex *value;
+};
+
 template <class T, class E>
 struct node_data{
   T key;
-  E value;
+  vertex_node *value;
 };
 
 template <class T, class E>
@@ -395,6 +408,8 @@ bool HashTable<T, E>::contains(T key) {
 template <class T, class E>
 class Graph {
 private:
+  T *nodes_arr;
+  HashTable<T, E> *vertexes;
 public:
 
 }
