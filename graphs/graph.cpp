@@ -7,22 +7,22 @@
 using namespace std;
 
 
-template <class T, class E>
 struct vertex_data{
   int weight;
   int heuristic;
 }
 
-template <class T, class E>
+template <class E>
 struct vertex{
-  T key;
+  E key;
   vertex_data *value;
+  int rear;
 };
 
 template <class T, class E>
 struct node_data{
   T key;
-  vertex_node *value;
+  vertex<E> *value;
 };
 
 template <class T, class E>
@@ -60,10 +60,13 @@ public:
   };
   int get_size();
   void add_node(T key, E val);
+  void add_weight(T key, E val, int weight);
+  void add_heuristic(T key, E val, int heuristic);
   node<T, E> *get_head();
   node<T, E> *get_tail();
   bool contains(T key);
   node<T, E> *remove_node(T key);
+  vertex<E> *remove_vertex(T key, E vertex_key);
 };
 
 template <class T, class E>
@@ -76,7 +79,12 @@ void LinkedList<T, E>::add_node(T key, E val){
   if (this->size == 0) {
     node<T, E> *new_node = new node<T, E>();
     new_node->data.key = key;
-    new_node->data.value = val;
+    new_node->data.value = new vertex<E>[];
+    new_node->data.value->vertex->key = val;
+    new_node->data.value->vertex->rear = 0;
+    int last_index = new_node->data.value->vertex->rear;
+    new_node->data.value->vertex->value[last_index] = new vertex_data();
+    new_node->data.value->vertex->rear++;
 
     this->head = new_node;
     this->tail = new_node;
@@ -90,12 +98,66 @@ void LinkedList<T, E>::add_node(T key, E val){
 
     current_node->next = new node<T, E>();
     current_node->next->data.key = key;
-    current_node->next->data.value = val;
+    current_node->next->data.value = new vertex<E>();
+    current_node->next->data.value->vertex->key = val;
+    current_node->data.value->vertex->rear = 0;
+    int last_index = current_node->data.value->vertex->rear;
+    current_node->next->data.value->vertex->value[last_index] = new vertex_data();
+    current_node->data.value->vertex->rear++;
 
     this->tail = current_node->next;
     this->size++;
   }
 }
+
+template <class T, class E>
+void LinkedList<T, E>::add_weight(T key, E vertex_key, int weight){
+
+  if (this->size == 0) {
+    throw "Vertex Does Not Exist"
+  } else {
+
+    node<T, E> *current_node = get_node(key);
+    bool completed = false;
+    int last_index = current_node->data.value->vertex;
+
+    for (int i = 0; i < current_node->data.value->vertex->rear; i++) {
+      if (current_node->data.value->vertex->value[i]->key == vertex_key) {
+        current_node->data.value->vertex->value[i]->value->weight = weight;
+        completed = true;
+      }
+
+      if (completed) {
+        return;
+      }
+    }
+  }
+}
+
+template <class T, class E>
+void LinkedList<T, E>::add_heuristic(T key, E vertex_key, int heuristic){
+
+  if (this->size == 0) {
+    throw "Vertex Does Not Exist"
+  } else {
+
+    node<T, E> *current_node = get_node(key);
+    bool completed = false;
+    int last_index = current_node->data.value->vertex;
+
+    for (int i = 0; i < current_node->data.value->vertex->rear; i++) {
+      if (current_node->data.value->vertex->value[i]->key == vertex_key) {
+        current_node->data.value->vertex->value[i]->value->heuristic = heuristic;
+        completed = true;
+      }
+
+      if (completed) {
+        return;
+      }
+    }
+  }
+}
+
 
 template <class T, class E>
 bool LinkedList<T, E>::contains(T key) {
@@ -166,6 +228,83 @@ node<T, E> *LinkedList<T, E>::remove_node(T key) {
   }
 
   return removed_node;
+}
+
+template <class T, class E>
+node<T, E> *LinkedList<T, E>::get_node(T key) {
+  if (this->size == 0) {
+    return NULL;
+  }
+
+  node<T, E> *current_node = this->head;
+
+  while(current_node->next != NULL) {
+    if (current_node->data.key == key) {
+      return current_node;
+    }
+    current_node = current_node->next;
+  }
+}
+
+template <class T, class E>
+node<T, E> *LinkedList<T, E>::remove_vertex(T key, E vertex_key) {
+  if (this->size == 0) {
+    throw "Empty List";
+  }
+
+  node<T, E> *removed_vertex = NULL;
+  if (contains(key)) {
+    node<T, E> *current_node = get_node(key);
+
+    if (this->head->data.key == key) {
+      removed_node = this->head;
+      this->head = this->head->next;
+
+      if (this->size == 1) {
+        this->tail = NULL;
+      }
+
+      return removed_node;
+    }
+
+    node<T, E> *current_node = this->head;
+    node<T, E> *prev_node;
+    bool start_swap = false;
+
+    while(current_node->next != NULL) {
+      prev_node = current_node;
+      current_node = current_node->next;
+
+      if (current_node->data.key == key) {
+        while(current_node->data.value->vertex)
+        for (int i = 0; i < current_node->data.value->vertex->rear; i++) {
+          if (current_node->data.value->vertex[i]->key == vertex_key) {
+            removed_vertex = current_node->data.value->vertex[i];
+            start_swap = true;
+          }
+
+          if (start_swap) {
+            swap(
+              current_node->data.value->vertex[i],
+              current_node->data.value->vertex[i + 1],
+            );
+          }
+        }
+
+        if (removed_vertex != NULL) {
+          current_node->data.value->vertex->rear--;
+        }
+      }
+    }
+  }
+
+  if (removed_vertex == NULL) {
+    throw "Vertex does not exist";
+  }
+
+  delete start_swap;
+
+  return removed_vertex;
 }
 
 /**************************************
