@@ -523,6 +523,7 @@ int HashTable<T, E>::get_size() {
 
 template <class T, class E>
 int HashTable<T, E>::get_storage_limit() {
+  cout << "WHATT: " << storage_limit << endl;
   return storage_limit;
 }
 
@@ -736,7 +737,9 @@ public:
     HashTable<T, E> *vertexes = new HashTable<T, E>(initial_size);
   }
   ~Graph() {
+    cout << "REACHES HERE" << endl;
     vertexes->~HashTable();
+    cout << "GETS HERE THOO" << endl;
     delete []nodes_arr;
   }
   void add_vertex(T vertex);
@@ -756,11 +759,19 @@ public:
   int cost_length(T from, E to);
   int heuristic_length(T from, E to);
   vertex<E> *remove_vertex(T vertex);
+  HashTable<T, E> *get_vertexes();
 };
+
+template <class T, class E>
+HashTable<T, E> *Graph<T, E>::get_vertexes() {
+  return vertexes;
+}
 // End Class
 
 int main(void) {
   Graph<string, string> *graph_instance = new Graph<string, string>(20);
   cout << "Got here and properly initialized Graph" << endl;
+  HashTable<string, string> *ht = graph_instance->get_vertexes();
+  ht->insert("02qled_ad-ke9t_0ru", "Alex");
   return 1;
 }
