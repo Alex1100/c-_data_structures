@@ -10,7 +10,7 @@ using namespace std;
 struct vertex_data{
   int weight;
   int heuristic;
-}
+};
 
 template <class E>
 struct vertex{
@@ -22,7 +22,7 @@ struct vertex{
 template <class T, class E>
 struct node_data{
   T key;
-  vertex<E> *value;
+  vertex<E> *value[];
 };
 
 template <class T, class E>
@@ -30,6 +30,174 @@ struct node{
   node_data<T, E> data;
   node<T, E> *next;
 };
+
+
+/**************************************
+ * @class Stack
+ * @desc  Implements Stack
+ *************************************/
+template <class T>
+class Stack{
+private:
+  int front, rear, max;
+  T *s;
+public:
+  Stack(int size=0){
+    front = rear = 0;
+    max = size;
+    s = new T[size];
+  }
+
+  ~Stack(){
+    delete []s;
+  }
+
+  int insert(T);
+  T pop();
+  T printStack();
+  T getItemAt(int index);
+  bool isEmpty();
+};
+
+template <class T>
+int Stack<T>::insert(T item){
+  if (rear >= max) {
+    return -2;
+  }
+  s[rear] = item;
+  rear++;
+}
+
+template <class T>
+T Stack<T>::pop(){
+  if(rear<=0){
+    return -1;
+  }
+  T result = s[rear - 1];
+  --rear;
+  return result;
+}
+
+template <class T>
+T Stack<T>::printStack(){
+  for (int i = 0; i < rear; ++i){
+    cout << s[i] << endl;
+  }
+}
+
+template <class T>
+T Stack<T>::getItemAt(int index){
+  if (index < rear) {
+    return s[index];
+  }
+
+  return -1;
+}
+
+template <class T>
+bool Stack<T>::isEmpty(){
+  if (rear <= 0) {
+    return true;
+  }
+
+  return false;
+}
+// End Class
+
+/**************************************
+ * @class Queue
+ * @desc  Implements Queue
+ *************************************/
+template <class T>
+class Queue{
+private:
+  int front, rear, max;
+  T *q;
+public:
+  Queue(int size=0){
+    front = rear = 0;
+    max = size;
+    q = new T[size];
+  }
+  ~Queue(){
+    delete []q;
+  }
+  T get_front();
+  T dequeue();
+  T get_item_at(int index);
+  void print_queue();
+  void enqueue(T);
+  bool contains(T item);
+  bool is_empty();
+};
+
+
+template <class T>
+void Queue<T>::enqueue(T elem){
+  if(front >= max){
+    throw "Out of space. Reallocate memory";
+  }
+  q[rear] = elem; rear++;
+}
+
+template <class T>
+T Queue<T>::dequeue(){
+  if(this->is_empty()){
+    throw "Empty Queue";
+  }
+
+  T result = q[front];
+  for (int i = 0; i < rear; i++) {
+    swap(q[i], q[i + 1]);
+  }
+
+  --rear;
+  return result;
+
+}
+
+template <class T>
+void Queue<T>::print_queue(){
+  for (int i = 0; i < front; ++i){
+    cout << q[i] << endl;
+  }
+}
+
+template <class T>
+T Queue<T>::get_item_at(int index){
+  if (index <= max) {
+    return q[index];
+  }
+
+  return -1;
+}
+
+template <class T>
+T Queue<T>::get_front(){
+  return this->q[this->front];
+}
+
+template <class T>
+bool Queue<T>::is_empty() {
+  if (rear <= 0) {
+    return true;
+  }
+
+  return false;
+}
+
+template <class T>
+bool Queue<T>::contains(T item) {
+  for (int i = 0; i < rear; ++i) {
+    if (this->q[i] == item) {
+      return true;
+    }
+  }
+
+  return false;
+}
+//End Class
+
 
 /**************************************
  * @class LinkedList
@@ -67,6 +235,7 @@ public:
   bool contains(T key);
   node<T, E> *remove_node(T key);
   vertex<E> *remove_vertex(T key, E vertex_key);
+  node<T, E> *get_node(T key);
 };
 
 template <class T, class E>
@@ -79,7 +248,7 @@ void LinkedList<T, E>::add_node(T key, E val){
   if (this->size == 0) {
     node<T, E> *new_node = new node<T, E>();
     new_node->data.key = key;
-    new_node->data.value = new vertex<E>[];
+    new_node->data.value = new vertex<E>();
     new_node->data.value->vertex->key = val;
     new_node->data.value->vertex->rear = 0;
     int last_index = new_node->data.value->vertex->rear;
@@ -114,7 +283,7 @@ template <class T, class E>
 void LinkedList<T, E>::add_weight(T key, E vertex_key, int weight){
 
   if (this->size == 0) {
-    throw "Vertex Does Not Exist"
+    throw "Vertex Does Not Exist";
   } else {
 
     node<T, E> *current_node = get_node(key);
@@ -138,7 +307,7 @@ template <class T, class E>
 void LinkedList<T, E>::add_heuristic(T key, E vertex_key, int heuristic){
 
   if (this->size == 0) {
-    throw "Vertex Does Not Exist"
+    throw "Vertex Does Not Exist";
   } else {
 
     node<T, E> *current_node = get_node(key);
@@ -247,36 +416,20 @@ node<T, E> *LinkedList<T, E>::get_node(T key) {
 }
 
 template <class T, class E>
-node<T, E> *LinkedList<T, E>::remove_vertex(T key, E vertex_key) {
+vertex<E> *LinkedList<T, E>::remove_vertex(T key, E vertex_key) {
   if (this->size == 0) {
     throw "Empty List";
   }
+  node<T, E> *current_node = NULL;
+  vertex<E> *removed_vertex = NULL;
 
-  node<T, E> *removed_vertex = NULL;
   if (contains(key)) {
-    node<T, E> *current_node = get_node(key);
-
-    if (this->head->data.key == key) {
-      removed_node = this->head;
-      this->head = this->head->next;
-
-      if (this->size == 1) {
-        this->tail = NULL;
-      }
-
-      return removed_node;
-    }
-
-    node<T, E> *current_node = this->head;
+    current_node = this->head;
     node<T, E> *prev_node;
     bool start_swap = false;
 
-    while(current_node->next != NULL) {
-      prev_node = current_node;
-      current_node = current_node->next;
-
-      if (current_node->data.key == key) {
-        while(current_node->data.value->vertex)
+    if (current_node->data.key == key) {
+      while(current_node->data.value->vertex) {
         for (int i = 0; i < current_node->data.value->vertex->rear; i++) {
           if (current_node->data.value->vertex[i]->key == vertex_key) {
             removed_vertex = current_node->data.value->vertex[i];
@@ -286,13 +439,38 @@ node<T, E> *LinkedList<T, E>::remove_vertex(T key, E vertex_key) {
           if (start_swap) {
             swap(
               current_node->data.value->vertex[i],
-              current_node->data.value->vertex[i + 1],
-            );
+              current_node->data.value->vertex[i + 1]);
           }
         }
 
         if (removed_vertex != NULL) {
           current_node->data.value->vertex->rear--;
+        }
+      }
+    } else {
+      while(current_node->next != NULL) {
+        prev_node = current_node;
+        current_node = current_node->next;
+
+        if (current_node->data.key == key) {
+          while(current_node->data.value->vertex) {
+            for (int i = 0; i < current_node->data.value->vertex->rear; i++) {
+              if (current_node->data.value->vertex[i]->key == vertex_key) {
+                removed_vertex = current_node->data.value->vertex[i];
+                start_swap = true;
+              }
+
+              if (start_swap) {
+                swap(
+                  current_node->data.value->vertex[i],
+                  current_node->data.value->vertex[i + 1]);
+              }
+            }
+
+            if (removed_vertex != NULL) {
+              current_node->data.value->vertex->rear--;
+            }
+          }
         }
       }
     }
@@ -301,8 +479,6 @@ node<T, E> *LinkedList<T, E>::remove_vertex(T key, E vertex_key) {
   if (removed_vertex == NULL) {
     throw "Vertex does not exist";
   }
-
-  delete start_swap;
 
   return removed_vertex;
 }
@@ -546,12 +722,45 @@ bool HashTable<T, E>::contains(T key) {
 template <class T, class E>
 class Graph {
 private:
-  T *nodes_arr;
   HashTable<T, E> *vertexes;
+  T *nodes_arr;
+  int front, rear, size;
+  void depth_first_search(T source_vertex, HashTable<T, E> *visited, Stack<T> *visited_data);
+  void breadth_first_search(T source_vertex, Queue<T> *result, HashTable<T, E> *visited, Queue<T> *node_queue);
 public:
-
-}
+  Graph(int initial_size) {
+    front = 0;
+    rear = initial_size -1;
+    size = 0;
+    nodes_arr = new T[initial_size];
+    HashTable<T, E> *vertexes = new HashTable<T, E>(initial_size);
+  }
+  ~Graph() {
+    vertexes->~HashTable();
+    delete []nodes_arr;
+  }
+  void add_vertex(T vertex);
+  void add_edge(T from, E to);
+  void add_edges(T from, E to);
+  void add_edge_weight(T from, E to);
+  void add_edge_weights(T from, E to);
+  void add_heuristic_cost(T from, E to);
+  void add_heuristic_costs(T from, E to);
+  void remove_edge(T from, E to);
+  void depth_first_search(T vertex, Stack<T> *visited_data);
+  void breadth_first_search(T vertex, Queue<T> *result);
+  bool contains_vertex(T vertex);
+  bool has_edge(T from, E to);
+  bool same_vertexes(T from, E to);
+  bool has_all_edges(T from, E to);
+  int cost_length(T from, E to);
+  int heuristic_length(T from, E to);
+  vertex<E> *remove_vertex(T vertex);
+};
+// End Class
 
 int main(void) {
-  return 0;
+  Graph<string, string> *graph_instance = new Graph<string, string>(20);
+  cout << "Got here and properly initialized Graph" << endl;
+  return 1;
 }
