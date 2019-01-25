@@ -3,9 +3,10 @@
 #include <string>
 #include <sstream>
 #include <math.h>
+#include <unordered_map>
+
 
 using namespace std;
-
 
 struct vertex_data{
   int weight;
@@ -15,14 +16,15 @@ struct vertex_data{
 template <class E>
 struct vertex{
   E key;
-  vertex_data *value;
+  vertex_data *edge;
   int rear;
 };
 
 template <class T, class E>
 struct node_data{
   T key;
-  vertex<E> *value[];
+  vertex<E> *vertexes;
+  int rear;
 };
 
 template <class T, class E>
@@ -206,14 +208,14 @@ bool Queue<T>::contains(T item) {
 template <class T, class E>
 class LinkedList {
 private:
-  node<T, E> *head;
-  node<T, E> *tail;
-  int size;
+  node<T, E> *head = NULL;
+  node<T, E> *tail = NULL;
+  int vertexes_size = {0};
+  int size = {0};
 public:
   LinkedList() {
     head = new node<T, E>();
     tail = head;
-    size = 0;
   };
   ~LinkedList() {
     node<T, E> *current_node = this->head;
@@ -227,6 +229,7 @@ public:
     delete this->tail;
   };
   int get_size();
+  int get_vertexes_size();
   void add_node(T key, E val);
   void add_weight(T key, E val, int weight);
   void add_heuristic(T key, E val, int heuristic);
@@ -236,10 +239,17 @@ public:
   node<T, E> *remove_node(T key);
   vertex<E> *remove_vertex(T key, E vertex_key);
   node<T, E> *get_node(T key);
+  void update_vertex_arr_size(int initial_size);
 };
 
 template <class T, class E>
+int LinkedList<T, E>::get_vertexes_size() {
+  return vertexes_size;
+}
+
+template <class T, class E>
 int LinkedList<T, E>::get_size() {
+  cout << "AOAMDCS" << endl;
   return size;
 }
 
@@ -248,12 +258,12 @@ void LinkedList<T, E>::add_node(T key, E val){
   if (this->size == 0) {
     node<T, E> *new_node = new node<T, E>();
     new_node->data.key = key;
-    new_node->data.value = new vertex<E>();
-    new_node->data.value->vertex->key = val;
-    new_node->data.value->vertex->rear = 0;
-    int last_index = new_node->data.value->vertex->rear;
-    new_node->data.value->vertex->value[last_index] = new vertex_data();
-    new_node->data.value->vertex->rear++;
+    new_node->data.vertexes = new vertex<E>[get_vertexes_size()];
+    new_node->data.rear = 0;
+    new_node->data.vertexes[0].key = val;
+    new_node->data.vertexes[0].rear = 0;
+    new_node->data.vertexes[0].edge = new vertex_data();
+    new_node->data.vertexes->rear++;
 
     this->head = new_node;
     this->tail = new_node;
@@ -266,13 +276,13 @@ void LinkedList<T, E>::add_node(T key, E val){
     }
 
     current_node->next = new node<T, E>();
-    current_node->next->data.key = key;
-    current_node->next->data.value = new vertex<E>();
-    current_node->next->data.value->vertex->key = val;
-    current_node->data.value->vertex->rear = 0;
-    int last_index = current_node->data.value->vertex->rear;
-    current_node->next->data.value->vertex->value[last_index] = new vertex_data();
-    current_node->data.value->vertex->rear++;
+    current_node->data.key = key;
+    current_node->data.vertexes = new vertex<E>[get_vertexes_size()];
+    current_node->data.rear = 0;
+    current_node->data.vertexes[0].key = val;
+    current_node->data.vertexes[0].rear = 0;
+    current_node->data.vertexes[0].edge = new vertex_data();
+    current_node->data.vertexes->rear++;
 
     this->tail = current_node->next;
     this->size++;
@@ -288,11 +298,12 @@ void LinkedList<T, E>::add_weight(T key, E vertex_key, int weight){
 
     node<T, E> *current_node = get_node(key);
     bool completed = false;
-    int last_index = current_node->data.value->vertex;
+    int last_index = current_node->data.rear;
+    // current_node->data.value->vertex->rear
 
-    for (int i = 0; i < current_node->data.value->vertex->rear; i++) {
-      if (current_node->data.value->vertex->value[i]->key == vertex_key) {
-        current_node->data.value->vertex->value[i]->value->weight = weight;
+    for (int i = 0; i < last_index; i++) {
+      if (current_node->data.vertexes[i].key == vertex_key) {
+        current_node->data.vertexes[i].edge->weight = weight;
         completed = true;
       }
 
@@ -312,11 +323,11 @@ void LinkedList<T, E>::add_heuristic(T key, E vertex_key, int heuristic){
 
     node<T, E> *current_node = get_node(key);
     bool completed = false;
-    int last_index = current_node->data.value->vertex;
+    int last_index = current_node->data.rear;
 
-    for (int i = 0; i < current_node->data.value->vertex->rear; i++) {
-      if (current_node->data.value->vertex->value[i]->key == vertex_key) {
-        current_node->data.value->vertex->value[i]->value->heuristic = heuristic;
+    for (int i = 0; i < last_index; i++) {
+      if (current_node->data.vertexes[i].key == vertex_key) {
+        current_node->data.vertexes[i].edge->heuristic = heuristic;
         completed = true;
       }
 
@@ -483,6 +494,11 @@ vertex<E> *LinkedList<T, E>::remove_vertex(T key, E vertex_key) {
   return removed_vertex;
 }
 
+template <class T, class E>
+void LinkedList<T, E>::update_vertex_arr_size(int initial_size) {
+  vertexes_size = initial_size;
+}
+
 /**************************************
  * @class HashTable
  * @desc  Implements HashTable
@@ -490,18 +506,21 @@ vertex<E> *LinkedList<T, E>::remove_vertex(T key, E vertex_key) {
 template <class T, class E>
 class HashTable {
 private:
-  LinkedList<T, E> *storage;
-  int front, rear, size, storage_limit;
-  const int hash_salt = {11021992};
-  void expand();
-  void shrink();
+  int front, rear, size = {0};
+  // void expand();
+  // void shrink();
 public:
   HashTable(int initial_size) {
     front = 0;
-    rear = initial_size - 1;
-    size = 0;
     storage_limit = initial_size;
     storage = new LinkedList<T, E>[storage_limit];
+    for (int i = 0; i < initial_size; i++) {
+      storage[i].update_vertex_arr_size(initial_size);
+      cout << storage[i].get_vertexes_size() << endl;
+    }
+    rear = initial_size - 1;
+    size = 0;
+    cout << "TEST: " << get_storage_limit() << endl;
   }
   ~HashTable(){
     delete []storage;
@@ -514,6 +533,9 @@ public:
   LinkedList<T, E> *get_bucket(int hash_key_index);
   bool is_int(T key);
   bool contains(T key);
+
+  LinkedList<T, E> *storage = NULL;
+  int storage_limit = {0};
 };
 
 template <class T, class E>
@@ -523,135 +545,129 @@ int HashTable<T, E>::get_size() {
 
 template <class T, class E>
 int HashTable<T, E>::get_storage_limit() {
-  cout << "WHATT: " << storage_limit << endl;
+  cout << "TEST: " << storage_limit << endl;
+  cout << "OKKOO: " << front << "\n" << rear << "\n" << size << endl;
   return storage_limit;
 }
 
-template <class T, class E>
-void HashTable<T, E>::expand() {
-  int all_item_count = 0;
-  int temp_vals_rear = 0;
+// template <class T, class E>
+// void HashTable<T, E>::expand() {
+//   int all_item_count = 0;
+//   int temp_vals_rear = 0;
 
-  for (int i = 0; i < storage_limit; i++) {
-    if (storage[i].get_size() > 0) {
-      all_item_count += storage[i].get_size();
-    }
-  }
+//   for (int i = 0; i < storage_limit; i++) {
+//     if (storage[i].get_size() > 0) {
+//       all_item_count += storage[i].get_size();
+//     }
+//   }
 
-  node<T, E> *temp_vals = new node<T, E>[all_item_count];
+//   node<T, E> *temp_vals = new node<T, E>[all_item_count];
 
-  for (int j = 0; j < storage_limit; j++) {
-    if (storage[j].get_size()) {
-      node<T, E> *current_node = storage[j].get_head();
+//   for (int j = 0; j < storage_limit; j++) {
+//     if (storage[j].get_size()) {
+//       node<T, E> *current_node = storage[j].get_head();
 
-      while(current_node != NULL) {
-        temp_vals[temp_vals_rear] = *(current_node);
-        temp_vals_rear++;
-        current_node = current_node->next;
-      }
-    }
-  }
+//       while(current_node != NULL) {
+//         temp_vals[temp_vals_rear] = *(current_node);
+//         temp_vals_rear++;
+//         current_node = current_node->next;
+//       }
+//     }
+//   }
 
-  size_t newSize = storage_limit * 2;
-  LinkedList<T, E> *new_storage = new LinkedList<T, E>[newSize];
+//   size_t newSize = storage_limit * 2;
+//   LinkedList<T, E> *new_storage = new LinkedList<T, E>[newSize];
 
-  memcpy(new_storage, storage, storage_limit * sizeof(LinkedList<T, E>));
+//   memcpy(new_storage, storage, storage_limit * sizeof(LinkedList<T, E>));
 
-  storage_limit = newSize;
-  delete []storage;
-  storage = new_storage;
+//   storage_limit = newSize;
+//   delete []storage;
+//   storage = new_storage;
 
-  for (int s = 0; s < storage_limit; s++) {
-    storage[s] = *(new LinkedList<T, E>());
-  }
+//   for (int s = 0; s < storage_limit; s++) {
+//     storage[s] = *(new LinkedList<T, E>());
+//   }
 
-  size = 0;
+//   size = 0;
 
-  for (int v = 0; v < temp_vals_rear; v++) {
-    insert(temp_vals[v].data.key, temp_vals[v].data.value);
-  }
-}
+//   for (int v = 0; v < temp_vals_rear; v++) {
+//     insert(temp_vals[v].data.key, temp_vals[v].data.vertexes);
+//   }
+// }
 
 template <class T, class E>
 void HashTable<T, E>::insert(T key, E val) {
-  if (size == floor(storage_limit * 0.625)) {
-    expand();
-  }
-
+  // if (size == floor(storage_limit * 0.625)) {
+  //   expand();
+  // }
   int storage_index = hash(key);
+  cout << "YOYOYO" << endl;
 
   if (!storage[storage_index].get_size()) {
     storage[storage_index].add_node(key, val);
+    cout << "WOOOT" << endl;
     size++;
     return;
+  } else if (storage[storage_index].contains(key)) {
+    storage[storage_index].remove_node(key);
+    storage[storage_index].add_node(key, val);
+  } else {
+    storage[storage_index].add_node(key, val);
   }
 
-  bool complete = false;
-  node<T, E> *current_node = storage[storage_index].get_head();
-
-  while(current_node != NULL && !complete) {
-    if (current_node->data.key == key) {
-      current_node->data.value = val;
-      complete = true;
-      return;
-    }
-    current_node = current_node->next;
-  }
-
-  storage[storage_index].add_node(key, val);
   size++;
 }
 
-template <class T, class E>
-void HashTable<T, E>::shrink() {
-  int all_item_count = 0;
-  int temp_vals_rear = 0;
+// template <class T, class E>
+// void HashTable<T, E>::shrink() {
+//   int all_item_count = 0;
+//   int temp_vals_rear = 0;
 
-  for (int i = 0; i < storage_limit; i++) {
-    if (storage[i].get_size() > 0) {
-      all_item_count += storage[i].get_size();
-    }
-  }
+//   for (int i = 0; i < storage_limit; i++) {
+//     if (storage[i].get_size() > 0) {
+//       all_item_count += storage[i].get_size();
+//     }
+//   }
 
-  node<T, E> *temp_vals = new node<T, E>[all_item_count];
+//   node<T, E> *temp_vals = new node<T, E>[all_item_count];
 
-  for (int j = 0; j < storage_limit; j++) {
-    if (storage[j].get_size()) {
-      node<T, E> *current_node = storage[j].get_head();
+//   for (int j = 0; j < storage_limit; j++) {
+//     if (storage[j].get_size()) {
+//       node<T, E> *current_node = storage[j].get_head();
 
-      while(current_node != NULL) {
-        temp_vals[temp_vals_rear] = *(current_node);
-        temp_vals_rear++;
-        current_node = current_node->next;
-      }
-    }
-  }
+//       while(current_node != NULL) {
+//         temp_vals[temp_vals_rear] = *(current_node);
+//         temp_vals_rear++;
+//         current_node = current_node->next;
+//       }
+//     }
+//   }
 
-  size_t newSize = floor(storage_limit / 2);
-  LinkedList<T, E> *new_storage = new LinkedList<T, E>[newSize];
+//   size_t newSize = floor(storage_limit / 2);
+//   LinkedList<T, E> *new_storage = new LinkedList<T, E>[newSize];
 
-  memcpy(new_storage, storage, storage_limit * sizeof(LinkedList<T, E>));
+//   memcpy(new_storage, storage, storage_limit * sizeof(LinkedList<T, E>));
 
-  storage_limit = newSize;
-  delete []storage;
-  storage = new_storage;
+//   storage_limit = newSize;
+//   delete []storage;
+//   storage = new_storage;
 
-  for (int s = 0; s < storage_limit; s++) {
-    storage[s] = *(new LinkedList<T, E>());
-  }
+//   for (int s = 0; s < storage_limit; s++) {
+//     storage[s] = *(new LinkedList<T, E>());
+//   }
 
-  size = 0;
+//   size = 0;
 
-  for (int v = 0; v < temp_vals_rear; v++) {
-    insert(temp_vals[v].data.key, temp_vals[v].data.value);
-  }
-}
+//   for (int v = 0; v < temp_vals_rear; v++) {
+//     insert(temp_vals[v].data.key, temp_vals[v].data.value);
+//   }
+// }
 
 template <class T, class E>
 node<T, E> *HashTable<T, E>::remove(T key) {
-  if (size <= floor(storage_limit * 0.4)) {
-    shrink();
-  }
+  // if (size <= floor(storage_limit * 0.4)) {
+  //   shrink();
+  // }
 
   int storage_index = hash(key);
 
@@ -690,10 +706,10 @@ int HashTable<T, E>::hash(T key) {
   for (int i = 0; i < converted_key.length(); i++) {
     hashed_base = (hashed_base << 5) + hashed_base + int(converted_key[i]);
     hashed_base = hashed_base & hashed_base;
-    hashed_base = abs(hashed_base << hash_salt);
+    hashed_base = abs(hashed_base << 30);
   }
 
-  return hashed_base % this->get_storage_limit();
+  return hashed_base % storage_limit;
 }
 
 template <class T, class E>
@@ -723,55 +739,59 @@ bool HashTable<T, E>::contains(T key) {
 template <class T, class E>
 class Graph {
 private:
-  HashTable<T, E> *vertexes;
-  T *nodes_arr;
-  int front, rear, size;
-  void depth_first_search(T source_vertex, HashTable<T, E> *visited, Stack<T> *visited_data);
-  void breadth_first_search(T source_vertex, Queue<T> *result, HashTable<T, E> *visited, Queue<T> *node_queue);
+  T *nodes_arr = NULL;
+  int front, rear, size = {0};
+  // void depth_first_search(T source_vertex, HashTable<T, E> *visited, Stack<T> *visited_data);
+  // void breadth_first_search(T source_vertex, Queue<T> *result, HashTable<T, E> *visited, Queue<T> *node_queue);
 public:
   Graph(int initial_size) {
     front = 0;
-    rear = initial_size -1;
-    size = 0;
-    nodes_arr = new T[initial_size];
     HashTable<T, E> *vertexes = new HashTable<T, E>(initial_size);
+    nodes_arr = new T[initial_size];
+    rear = initial_size - 1;
+    size = 0;
+    vertexes_size = initial_size;
   }
   ~Graph() {
-    cout << "REACHES HERE" << endl;
     vertexes->~HashTable();
-    cout << "GETS HERE THOO" << endl;
     delete []nodes_arr;
   }
   void add_vertex(T vertex);
-  void add_edge(T from, E to);
-  void add_edges(T from, E to);
-  void add_edge_weight(T from, E to);
-  void add_edge_weights(T from, E to);
-  void add_heuristic_cost(T from, E to);
-  void add_heuristic_costs(T from, E to);
-  void remove_edge(T from, E to);
-  void depth_first_search(T vertex, Stack<T> *visited_data);
-  void breadth_first_search(T vertex, Queue<T> *result);
-  bool contains_vertex(T vertex);
-  bool has_edge(T from, E to);
-  bool same_vertexes(T from, E to);
-  bool has_all_edges(T from, E to);
-  int cost_length(T from, E to);
-  int heuristic_length(T from, E to);
-  vertex<E> *remove_vertex(T vertex);
-  HashTable<T, E> *get_vertexes();
+  // void add_edge(T from, E to);
+  // void add_edges(T from, E to);
+  // void add_edge_weight(T from, E to);
+  // void add_edge_weights(T from, E to);
+  // void add_heuristic_cost(T from, E to);
+  // void add_heuristic_costs(T from, E to);
+  // void remove_edge(T from, E to);
+  // void depth_first_search(T vertex, Stack<T> *visited_data);
+  // void breadth_first_search(T vertex, Queue<T> *result);
+  // bool contains_vertex(T vertex);
+  // bool has_edge(T from, E to);
+  // bool same_vertexes(T from, E to);
+  // bool has_all_edges(T from, E to);
+  // int cost_length(T from, E to);
+  // int heuristic_length(T from, E to);
+  // vertex<E> *remove_vertex(T vertex);
+
+  HashTable<T, E> *vertexes;
+  int vertexes_size = {0};
 };
 
 template <class T, class E>
-HashTable<T, E> *Graph<T, E>::get_vertexes() {
-  return vertexes;
+void Graph<T, E>::add_vertex(T key) {
+  vertexes->insert(key, key);
 }
 // End Class
 
-int main(void) {
-  Graph<string, string> *graph_instance = new Graph<string, string>(20);
+int main() {
+  Graph<string, string> *graph_instance = new Graph<string, string>(10);
   cout << "Got here and properly initialized Graph" << endl;
-  HashTable<string, string> *ht = graph_instance->get_vertexes();
-  ht->insert("02qled_ad-ke9t_0ru", "Alex");
+  graph_instance->add_vertex("120");
+  // HashTable<string, string> *ht = graph_instance->vertexes;
+  // cout << graph_instance->vertexes_size << endl;
+  // int myNum = ht->get_storage_limit();
+  // cout << "MY NUM: " << myNum << endl;
+  // ht->insert("02qled_ad-ke9t_0ru", "120");
   return 1;
 }
