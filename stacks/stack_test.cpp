@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Simple testcases 1
+#define BOOST_TEST_MODULE Simple testcases 2
 #include <boost/test/unit_test.hpp>
 #include "stack.h"
 using namespace std;
