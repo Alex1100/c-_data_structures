@@ -23,6 +23,7 @@ BOOST_AUTO_TEST_CASE(test2) {
   string topOfStack = {myStack->pop()};
   BOOST_CHECK_EQUAL(topOfStack, "3");
   BOOST_CHECK_EQUAL(myStack->get_count_of_items(), 2);
+  myStack->~Stack();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
