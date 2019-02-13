@@ -1,96 +1,77 @@
 #include <iostream>
-#include <vector>
-
+#include "stack.h"
 using namespace std;
 
-class Stack
-{
-public:
-  void insert(string item)
-  {
-    this->Items.push_back(item);
-    setNewSize(this->ItemSize + 1);
+
+/**************************************
+ * @class Stack
+ * @desc  Implements Stack
+ *************************************/
+template <class T>
+int Stack<T>::insert(T item){
+  if (rear >= max) {
+    return -2;
+  }
+  s[rear] = item;
+  rear++;
+}
+
+template <class T>
+T Stack<T>::pop(){
+  if(rear<=0){
+    return -1;
+  }
+  T result = s[rear - 1];
+  --rear;
+  return result;
+}
+
+template <class T>
+T Stack<T>::printStack(){
+  for (int i = 0; i < rear; ++i){
+    cout << s[i] << endl;
+  }
+}
+
+template <class T>
+T Stack<T>::getItemAt(int index){
+  if (index < rear) {
+    return s[index];
   }
 
-  string pop()
-  {
-    setNewSize(this->ItemSize - 1);
-    string poppedItem = this->Items.back();
-    this->Items.pop_back();
-    return poppedItem;
+  return -1;
+}
+
+template <class T>
+bool Stack<T>::isEmpty(){
+  if (rear <= 0) {
+    return true;
   }
 
-  bool contains(string item)
-  {
-    for (int i = 0; i < sizeof(this->Items) / sizeof(this->Items[0]); ++i)
-    {
-      if (this->Items[i] == item)
-      {
-        return true;
-      }
-    }
+  return false;
+}
+// End Class
 
-    return false;
-  }
 
-  string peek() const
-  {
-    return this->Items[sizeof(this->Items) / sizeof(this->Items[0]) - 1];
-  }
-
-  bool isEmpty()
-  {
-    return this->Items.empty();
-  }
-
-  void setNewSize(int new_size)
-  {
-    ItemSize = new_size;
-  }
-
-  void printStack() const
-  {
-    // Forward (Normal)
-    for (int i = sizeof(this->Items) / sizeof(this->Items[0]); i >= 0; i--) {
-        cout << this->Items[i] << "\n";
-    }
-  }
-
-  void printStackInReverse() const
-  {
-    // Reversed
-    copy(
-      begin(this->Items),
-      end(this->Items),
-      ostream_iterator<string>(cout, "\n")
-    );
-  }
-
-  int getStackItemCount() const
-  {
-    return ItemSize;
-  }
-
-private:
-  vector<string> Items;
-  int ItemSize;
-};
-
-int main()
-{
-  Stack myStack;
-  cout << myStack.isEmpty() << endl;
-  myStack.setNewSize(0);
-  myStack.insert("Alex");
-  myStack.insert("Doug");
-  myStack.printStack();
-  myStack.printStackInReverse();
-  myStack.pop();
-  cout << "\n" << endl;
-  cout << "SIZE OF MYSTACK IS: " << myStack.getStackItemCount() << endl;
-  myStack.printStack();
-  cout << myStack.contains("Alex") << endl;
-  cout << myStack.contains("Doug") << endl;
-  cout << myStack.peek() << endl;
-  cout << myStack.isEmpty() << endl;
+int main(void){
+    Stack<int> *myStack = new Stack<int>(10);
+    myStack->insert(1);
+    myStack->insert(2);
+    myStack->insert(3);
+    myStack->insert(4);
+    myStack->printStack();
+    cout << myStack->getItemAt(4) << endl;
+    cout << myStack->getItemAt(1) << "\n\n" << endl;
+    int someInt = {myStack->pop()};
+    int nextInt = {myStack->pop()};
+    cout << "INT RETURNED IS: " << someInt << endl;
+    cout << "NEXT INT IS: " << nextInt << endl;
+    cout << "AND UP NEXT: " << myStack->pop() << endl;
+    cout << "AND UP NEXT: " << myStack->pop() << endl;
+    cout << "\nHERE ON AFTER, SHOULD ONLY RETURN -1 FOR ERROR / EMPTY STACK" << endl;
+    cout << "AND UP NEXT: " << myStack->pop() << endl;
+    cout << "AND UP NEXT: " << myStack->pop() << endl;
+    cout << "AND UP NEXT: " << myStack->pop() << endl;
+    myStack->~Stack();
+    return 0;
 }
