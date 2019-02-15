@@ -5,7 +5,7 @@
 template <class T>
 void Queue<T>::enqueue(T elem){
   if(front >= max){
-    throw "Out of space. Reallocate memory";
+    throw runtime_error("Out of space. Reallocate memory");
   }
   q[rear] = elem; rear++;
 }

@@ -10,9 +10,10 @@ BOOST_AUTO_TEST_SUITE(suite1)
 
 // Tests `enqueue`
 BOOST_AUTO_TEST_CASE(test1) {
-  Queue<string> *myQueue = new Queue<string>(100);
+  Queue<string> *myQueue = new Queue<string>(1);
   myQueue->enqueue("100");
   BOOST_CHECK_EQUAL(myQueue->get_front(), "100");
+  BOOST_REQUIRE_THROW(assert(myQueue->enqueue("88")), runtime_error);
   myQueue->~Queue();
 };
 
