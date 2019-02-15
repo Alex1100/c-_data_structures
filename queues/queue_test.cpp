@@ -1,6 +1,8 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Simple testcases 2
+#define BOOST_TEST_MODULE Queue testcases 3
 #include <boost/test/unit_test.hpp>
+#include <boost/assert.hpp>
+#include <boost/test/execution_monitor.hpp>
 #include "queue.h"
 using namespace std;
 
@@ -22,5 +24,14 @@ BOOST_AUTO_TEST_CASE(test2) {
   BOOST_CHECK_EQUAL(myQueue->contains(1000), 0);
   myQueue->~Queue();
 };
+
+// Tests `get_item_at`
+BOOST_AUTO_TEST_CASE(test3) {
+  Queue<int> *myQueue = new Queue<int>(100);
+  myQueue->enqueue(99);
+  BOOST_CHECK_EQUAL(myQueue->get_item_at(0), 99);
+  BOOST_WARN_THROW(assert(myQueue->get_item_at(1)), runtime_error);
+  myQueue->~Queue();
+}
 
 BOOST_AUTO_TEST_SUITE_END();

@@ -28,11 +28,15 @@ T Queue<T>::dequeue(){
 
 template <class T>
 T Queue<T>::get_item_at(int index){
-  if (index <= max) {
-    return q[index];
+  if (index > max || index < 0) {
+    throw runtime_error("Index is out of range");
   }
 
-  return -1;
+  if (q[index] == NULL) {
+    throw runtime_error("Element at position Index not initialized");
+  }
+
+  return q[index];
 }
 
 template <class T>
