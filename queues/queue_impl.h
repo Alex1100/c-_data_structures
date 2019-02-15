@@ -13,7 +13,7 @@ void Queue<T>::enqueue(T elem){
 template <class T>
 T Queue<T>::dequeue(){
   if(this->is_empty()){
-    throw "Empty Queue";
+    throw runtime_error("Empty Queue");
   }
 
   T result = q[front];
@@ -41,6 +41,10 @@ T Queue<T>::get_item_at(int index){
 
 template <class T>
 T Queue<T>::get_front(){
+  if (this->is_empty()) {
+    throw runtime_error("Empty Queue");
+  }
+
   return this->q[this->front];
 }
 
