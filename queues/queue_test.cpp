@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Queue testcases 5
+#define BOOST_TEST_MODULE Queue testcases 6
 #include <boost/test/unit_test.hpp>
 #include <boost/assert.hpp>
 #include <boost/test/execution_monitor.hpp>
