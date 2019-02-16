@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Simple testcases 5
+#define BOOST_TEST_MODULE Stack testcases 5
 #include <boost/test/unit_test.hpp>
 #include <boost/assert.hpp>
 #include <boost/test/execution_monitor.hpp>
