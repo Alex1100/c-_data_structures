@@ -1,4 +1,6 @@
 //  stack.h
+#pragma once
+using namespace std;
 
 #ifndef STACK_H
 #define STACK_H
@@ -18,8 +20,8 @@ public:
 
   int insert(T);
   T pop();
-  T getItemAt(int index);
-  bool isEmpty();
+  T get_item_at(int index);
+  bool is_empty();
   int get_count_of_items();
 private:
   int front, rear, max;
