@@ -15,23 +15,23 @@ int main(void){
   tree->inorder_print();
   tree->postorder_print();
 
-  Queue<int> *myQueue = new Queue<int>(tree->getBTreeSize());
-  tree->breadth_first_search(myQueue);
+  Queue<int> *qq = new Queue<int>(tree->getBTreeSize());
+  tree->breadth_first_search(qq);
 
   cout << "\nBFS: " << endl;
-  myQueue->print_queue();
-  Stack<int> *myStack = new Stack<int>(tree->getBTreeSize());
-  tree->depth_first_search(myStack, "in_order");
+  qq->print_queue();
+  Stack<int> *ss = new Stack<int>(tree->getBTreeSize());
+  tree->depth_first_search(ss, "in_order");
   cout << "\nDFS: " << endl;
-  myStack->print_stack();
-  cout << "STACK IS EMPTY??: " << myStack->is_empty() << endl;
+  ss->print_stack();
+  cout << "STACK IS EMPTY??: " << ss->is_empty() << endl;
   cout << "IS TREE VALID BST??:: " << tree->is_valid_bst() << endl;
   cout << "MIN IN TREE IS: " << tree->find_min() << endl;
   cout << "MAX IN TREE IS: " << tree->find_max() << endl;
-  myQueue->~Queue();
-  myQueue = NULL;
-  myStack->~Stack();
-  myStack = NULL;
+  qq->~Queue();
+  qq = NULL;
+  ss->~Stack();
+  ss = NULL;
   tree->~btree();
   tree = NULL;
 
