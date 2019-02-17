@@ -25,6 +25,7 @@ public:
   void enqueue(T);
   bool contains(T item);
   bool is_empty();
+  void print_queue();
 };
 
 #include "queue_impl.h"

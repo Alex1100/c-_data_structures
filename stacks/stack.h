@@ -23,6 +23,7 @@ public:
   T get_item_at(int index);
   bool is_empty();
   int get_count_of_items();
+  void print_stack();
 private:
   int front, rear, max;
   T *s;

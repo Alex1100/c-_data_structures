@@ -3,6 +3,13 @@
  * @desc  Implements Stack
  *************************************/
 template <class T>
+void Stack<T>::print_stack(){
+  for (int i = rear - 1; i >= 0; --i){
+    cout << s[i] << endl;
+  }
+}
+
+template <class T>
 int Stack<T>::insert(T item){
   if (rear >= max) {
     throw runtime_error("Out of space. Please allocate more memory.");

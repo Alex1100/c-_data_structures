@@ -3,6 +3,13 @@
  * @desc  Implements Queue
  *************************************/
 template <class T>
+void Queue<T>::print_queue(){
+  for (int i = 0; i < rear; ++i){
+    cout << q[i] << endl;
+  }
+}
+
+template <class T>
 void Queue<T>::enqueue(T elem){
   if(front >= max){
     throw runtime_error("Out of space. Reallocate memory");
