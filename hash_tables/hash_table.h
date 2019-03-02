@@ -16,21 +16,21 @@ using namespace std;
 #include "linked_list.h"
 
 
-template <class T, class E>
+template <class T, class E, class Y>
 class HashTable {
 private:
-  LinkedList<T, E> *storage;
+  LinkedList<T, E, Y> *storage;
   int front, rear, size, storage_limit;
   const int hash_salt = {11021992};
   void expand();
   void shrink();
 public:
-  HashTable(int initial_size) {
+  HashTable(int initial_size = 10) {
     front = 0;
     rear = initial_size - 1;
     size = 0;
     storage_limit = initial_size;
-    storage = new LinkedList<T, E>[storage_limit];
+    storage = new LinkedList<T, E, Y>[storage_limit];
   }
   ~HashTable(){
     delete []storage;
@@ -38,11 +38,13 @@ public:
   int get_size();
   int get_storage_limit();
   int hash(T key);
-  void insert(T key, E val);
-  node<T, E> *remove(T key);
-  LinkedList<T, E> *get_bucket(int hash_key_index);
+  void insert(T key, E val, Y weight = 0.0, Y heuristic = 0.0);
+  node<T, E, Y> *remove(T key);
+  LinkedList<T, E, Y> *get_bucket(int hash_key_index);
   bool is_int(T key);
   bool contains(T key);
+  node<T, E, Y> *get_entry(T key);
+  LinkedList<T, E, Y> *get_storage();
 };
 
 #include "hash_table_impl.h"

@@ -2,44 +2,48 @@
  * @class LinkedList
  * @desc  Implements LinkedList
  *************************************/
-template <class T, class E>
-int LinkedList<T, E>::get_size() {
+template <class T, class E, class Y>
+int LinkedList<T, E, Y>::get_size() {
   return size;
 }
 
-template <class T, class E>
-void LinkedList<T, E>::add_node(T key, E val){
+template <class T, class E, class Y>
+void LinkedList<T, E, Y>::add_node(T key, E val, Y weight, Y heuristic){
   if (this->size == 0) {
-    node<T, E> *new_node = new node<T, E>();
+    node<T, E, Y> *new_node = new node<T, E, Y>();
     new_node->data.key = key;
     new_node->data.value = val;
+    new_node->data.weight = weight;
+    new_node->data.heuristic = heuristic;
 
     this->head = new_node;
     this->tail = new_node;
     this->size++;
   } else {
-    node<T, E> *current_node = this->head;
+    node<T, E, Y> *current_node = this->head;
 
     while(current_node->next != NULL) {
       current_node = current_node->next;
     }
 
-    current_node->next = new node<T, E>();
+    current_node->next = new node<T, E, Y>();
     current_node->next->data.key = key;
     current_node->next->data.value = val;
+    current_node->next->data.weight = weight;
+    current_node->next->data.heuristic = heuristic;
 
     this->tail = current_node->next;
     this->size++;
   }
 }
 
-template <class T, class E>
-bool LinkedList<T, E>::contains(T key) {
+template <class T, class E, class Y>
+bool LinkedList<T, E, Y>::contains(T key) {
   if (this->size == 0) {
     return false;
   }
 
-  node<T, E> *current_node = this->head;
+  node<T, E, Y> *current_node = this->head;
 
   if (current_node->data.key == key) {
     return true;
@@ -55,23 +59,23 @@ bool LinkedList<T, E>::contains(T key) {
   return false;
 }
 
-template <class T, class E>
-node<T, E> *LinkedList<T, E>::get_head() {
+template <class T, class E, class Y>
+node<T, E, Y> *LinkedList<T, E, Y>::get_head() {
   return this->head;
 }
 
-template <class T, class E>
-node<T, E> *LinkedList<T, E>::get_tail() {
+template <class T, class E, class Y>
+node<T, E, Y> *LinkedList<T, E, Y>::get_tail() {
   return this->tail;
 }
 
-template <class T, class E>
-node<T, E> *LinkedList<T, E>::remove_node(T key) {
+template <class T, class E, class Y>
+node<T, E, Y> *LinkedList<T, E, Y>::remove_node(T key) {
   if (this->size == 0) {
-    throw "Empty List";
+    throw runtime_error("Empty List");
   }
 
-  node<T, E> *removed_node = NULL;
+  node<T, E, Y> *removed_node = NULL;
 
   if (this->head->data.key == key) {
     removed_node = this->head;
@@ -81,11 +85,12 @@ node<T, E> *LinkedList<T, E>::remove_node(T key) {
       this->tail = NULL;
     }
 
+    size--;
     return removed_node;
   }
 
-  node<T, E> *current_node = this->head;
-  node<T, E> *prev_node;
+  node<T, E, Y> *current_node = this->head;
+  node<T, E, Y> *prev_node;
 
   while(current_node->next != NULL) {
     prev_node = current_node;
@@ -102,9 +107,32 @@ node<T, E> *LinkedList<T, E>::remove_node(T key) {
   }
 
   if (removed_node == NULL) {
-    throw "Node does not exist";
+    throw runtime_error("Node does not exist");
   }
 
+  size--;
   return removed_node;
+}
+
+template <class T, class E, class Y>
+node<T, E, Y> *LinkedList<T, E, Y>::get_item(T key) {
+  if (this->size == 0) {
+    throw runtime_error("Empty List");
+  }
+
+  node<T, E, Y> *current_node = this->head;
+
+  if (current_node->data.key == key) {
+    return current_node;
+  }
+
+  while(current_node->next != NULL) {
+    if (current_node->data.key == key) {
+      return current_node;
+    }
+    current_node = current_node->next;
+  }
+
+  throw runtime_error("Item is not found in the list");
 }
 // End Class
