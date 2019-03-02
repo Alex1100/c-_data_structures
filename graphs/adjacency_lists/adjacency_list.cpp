@@ -2,16 +2,19 @@
 
 
 int main(void) {
-  AdjacencyList<int> *adjList = new AdjacencyList<int>();
-  adjList->add_vertex("A");
-  cout << adjList->has_vertex("A") << endl;
-  adjList->add_vertex("C");
-  adjList->add_vertex("B");
-  adjList->add_vertex("F");
-  adjList->add_vertex("E");
-  adjList->add_vertex("D");
+  AdjacencyList<string, float> *adj_list = new AdjacencyList<string, float>();
+  adj_list->add_vertex("A", 10.3, 13.5);
+  cout << adj_list->has_vertex("A") << endl;
+  adj_list->add_vertex("C", 9.4, 5.4);
+  adj_list->add_vertex("B", 4.9, 10.5);
+  adj_list->add_vertex("F", 3.4, 1.2);
+  adj_list->add_vertex("E", 11.5, 34.2);
+  adj_list->add_vertex("D", 95.2, 14.8);
 
-
-  adjList
+  adj_list->add_edges("A", "E");
+  adj_list->add_edges("E", "C");
+  adj_list->add_edge("C", "F");
+  adj_list->add_edges("F", "A");
+  adj_list->add_edge("A", "D");
   return 0;
 }
