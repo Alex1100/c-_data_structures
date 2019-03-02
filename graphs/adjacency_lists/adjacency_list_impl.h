@@ -7,9 +7,9 @@
 
 template <class T>
 void AdjacencyList<T>::add_vertex(T vertex) {
-  bool vertexExists = has_vertex(vertex);
+  bool vertex_exists = has_vertex(vertex);
 
-  if (!vertexExists) {
+  if (!vertex_exists) {
     node_list[rear] = vertex;
     rear++;
     adjacency_list->insert(vertex, vertex);
