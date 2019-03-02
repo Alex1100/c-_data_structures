@@ -41,6 +41,10 @@ bool LinkedList<T, E>::contains(T key) {
 
   node<T, E> *current_node = this->head;
 
+  if (current_node->data.key == key) {
+    return true;
+  }
+
   while(current_node->next != NULL) {
     if (current_node->data.key == key) {
       return true;

@@ -59,7 +59,7 @@ void HashTable<T, E>::expand() {
 
 template <class T, class E>
 void HashTable<T, E>::insert(T key, E val) {
-  if (size == floor(storage_limit * 0.625)) {
+  if (size >= floor(storage_limit * 0.625)) {
     expand();
   }
 
@@ -189,9 +189,9 @@ bool HashTable<T, E>::is_int(T key) {
 template <class T, class E>
 bool HashTable<T, E>::contains(T key) {
   int storage_index = hash(key);
+
   if (
-      storage_index > storage_limit
-      || !storage[storage_index].get_size()
+      !storage[storage_index].get_size()
       || !storage[storage_index].contains(key)
   ) {
     return false;

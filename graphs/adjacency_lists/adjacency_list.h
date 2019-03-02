@@ -8,8 +8,9 @@ using namespace std;
 #ifndef ADJACENCY_LIST_H
 #define ADJACENCY_LIST_H
 
-#include "../stacks/stack.h"
-#include "../queues/queue.h"
+#include "../../stacks/stack.h"
+#include "../../queues/queue.h"
+#include "../../hash_tables/hash_table.h"
 
 template <class T>
 class AdjacencyList {
@@ -40,14 +41,14 @@ public:
   void remove_edge(T from, T to);
   void depth_first_search(T vertex, Stack<T> *visited_data);
   void breadth_first_search(T vertex, Queue<T> *result);
-  bool contains_vertex(T vertex);
+  bool has_vertex(T vertex);
   bool has_edge(T from, T to);
   bool same_vertexes(T from, T to);
   bool has_all_edges(T from, T to);
   int cost_length(T from, T to);
   int heuristic_length(T from, T to);
-  vertex<T> *remove_vertex(T vertex);
-}
+  HashTable<T, T> *remove_vertex(T vertex);
+};
 
 #include "adjacency_list_impl.h"
 
