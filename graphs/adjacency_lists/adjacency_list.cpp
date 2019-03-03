@@ -34,5 +34,7 @@ int main(void) {
     cout << dfs_result->pop() << endl;
   }
 
+  adj_list->~AdjacencyList();
+
   return 0;
 }
