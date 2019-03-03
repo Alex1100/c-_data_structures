@@ -18,8 +18,8 @@ private:
   int front, rear, max;
   HashTable<T, T, U> *adjacency_list;
   T *node_list;
-  void depth_first_search(T source_vertex, HashTable<T, T, U> *visited, Stack<T> *visited_data);
-  void breadth_first_search(T source_vertex, Queue<T> *result, HashTable<T, T, U> *visited, Queue<T> *node_queue);
+  void dfs_helper(T source_vertex, Stack<T> *visited);
+  void bfs_helper(T source_vertex, Queue<T> *result, HashTable<T, T, U> *visited, Queue<T> *node_queue);
 public:
   AdjacencyList(int size=10) {
     this->adjacency_list = new HashTable<T, T, U>(size);
@@ -34,12 +34,8 @@ public:
   void add_vertex(T vertex, U weight, U heuristic);
   void add_edge(T from, T to);
   void add_edges(T from, T to);
-  void add_edge_weight(T from, T to);
-  void add_edge_weights(T from, T to);
-  void add_heuristic_cost(T from, T to);
-  void add_heuristic_costs(T from, T to);
   void remove_edge(T from, T to);
-  void depth_first_search(T vertex, Stack<T> *visited_data);
+  Stack<T> *depth_first_search(T vertex);
   void breadth_first_search(T vertex, Queue<T> *result);
   bool has_vertex(T vertex);
   bool has_edge(T from, T to);
@@ -48,6 +44,7 @@ public:
   int cost_length(T from, T to);
   int heuristic_length(T from, T to);
   HashTable<T, T, U> *remove_vertex(T vertex);
+  node<T, T, U> *get_item(T vertex);
 };
 
 #include "adjacency_list_impl.h"

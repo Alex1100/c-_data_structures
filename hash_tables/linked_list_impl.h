@@ -19,6 +19,7 @@ void LinkedList<T, E, Y>::add_node(T key, E val, Y weight, Y heuristic){
     this->head = new_node;
     this->tail = new_node;
     this->size++;
+    return;
   } else {
     node<T, E, Y> *current_node = this->head;
 
@@ -34,6 +35,7 @@ void LinkedList<T, E, Y>::add_node(T key, E val, Y weight, Y heuristic){
 
     this->tail = current_node->next;
     this->size++;
+    return;
   }
 }
 
@@ -61,7 +63,7 @@ bool LinkedList<T, E, Y>::contains(T key) {
 
 template <class T, class E, class Y>
 node<T, E, Y> *LinkedList<T, E, Y>::get_head() {
-  return this->head;
+  return head;
 }
 
 template <class T, class E, class Y>
@@ -134,5 +136,32 @@ node<T, E, Y> *LinkedList<T, E, Y>::get_item(T key) {
   }
 
   throw runtime_error("Item is not found in the list");
+}
+
+template <class T, class E, class Y>
+node<T, E, Y> *LinkedList<T, E, Y>::get_item_at(int index) {
+  if (this->size == 0) {
+    throw runtime_error("Empty List");
+  }
+
+  if (index < 0 || index > this->size) {
+    throw runtime_error("Index provided is out of bounds");
+  }
+
+  node<T, E, Y> *current_node = this->head;
+
+  if (index == 0) {
+    return current_node;
+  }
+  int count = 0;
+
+  while(current_node->next != NULL) {
+    if (index == count) {
+      return current_node;
+    }
+
+    current_node = current_node->next;
+    count++;
+  }
 }
 // End Class

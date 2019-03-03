@@ -9,23 +9,27 @@ template <class T>
 class Stack {
 public:
   Stack(int size=0){
-    front = rear = 0;
+    front = 0;
+    stack_rear = 0;
     max = size;
     s = new T[size];
+    stack_count = 0;
   }
 
   ~Stack(){
     delete []s;
   }
 
-  int insert(T);
+  void insert(T item);
   T pop();
   T get_item_at(int index);
   bool is_empty();
   int get_count_of_items();
   void print_stack();
+  T *get_items();
+  bool contains(T item);
 private:
-  int front, rear, max;
+  int front, stack_rear, max, stack_count;
   T *s;
 };
 

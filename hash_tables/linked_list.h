@@ -34,6 +34,7 @@ public:
   bool contains(T key);
   node<T, E, Y> *remove_node(T key);
   node<T, E, Y> *get_item(T key);
+  node<T, E, Y> *get_item_at(int index);
 };
 
 #include "linked_list_impl.h"
