@@ -75,6 +75,36 @@ void AdjacencyList<T, U>::add_edge(T from, T to) {
 }
 
 template <class T, class U>
+void AdjacencyList<T, U>::remove_edges(T from, T to) {
+  auto from_found = adjacency_list->contains(from);
+  auto to_found = adjacency_list->contains(to);
+
+  if (!from_found || !to_found) {
+    throw runtime_error("One or more Vertexes not found in the graph.");
+  }
+
+  node<T, T, U> *from_node = adjacency_list->get_entry(from);
+  node<T, T, U> *to_node = adjacency_list->get_entry(to);
+
+  adjacency_list->get_storage()[adjacency_list->hash(to)].remove_node(from);
+  adjacency_list->get_storage()[adjacency_list->hash(from)].remove_node(to);
+}
+
+template <class T, class U>
+void AdjacencyList<T, U>::remove_edge(T from, T to) {
+  auto from_found = adjacency_list->contains(from);
+  auto to_found = adjacency_list->contains(to);
+
+  if (!from_found || !to_found) {
+    throw runtime_error("One or more Vertexes not found in the graph.");
+  }
+
+  node<T, T, U> *from_node = adjacency_list->get_entry(from);
+
+  adjacency_list->get_storage()[adjacency_list->hash(to)].remove_node(from);
+}
+
+template <class T, class U>
 node<T, T, U> *AdjacencyList<T, U>::get_item(T key) {
   int src_index = adjacency_list->hash(key);
   node<T, T, U> *current_node = adjacency_list->get_storage()[src_index].get_item(key);

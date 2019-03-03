@@ -35,16 +35,17 @@ public:
   void add_edge(T from, T to);
   void add_edges(T from, T to);
   void remove_edge(T from, T to);
-  Stack<T> *depth_first_search(T vertex);
-  void breadth_first_search(T vertex, Queue<T> *result);
+  void remove_edges(T from, T to);
+  HashTable<T, T, U> *remove_vertex(T vertex);
   bool has_vertex(T vertex);
   bool has_edge(T from, T to);
   bool same_vertexes(T from, T to);
   bool has_all_edges(T from, T to);
   int cost_length(T from, T to);
   int heuristic_length(T from, T to);
-  HashTable<T, T, U> *remove_vertex(T vertex);
   node<T, T, U> *get_item(T vertex);
+  Stack<T> *depth_first_search(T vertex);
+  Queue<T> *breadth_first_search(T vertex);
 };
 
 #include "adjacency_list_impl.h"
