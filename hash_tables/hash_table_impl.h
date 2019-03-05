@@ -78,7 +78,6 @@ void HashTable<T, E, Y>::insert(T key, E val, Y weight, Y heuristic) {
 
   bool complete = false;
   node<T, E, Y> *current_node = storage[storage_index].get_head();
-
   while(current_node != NULL && !complete) {
     if (current_node->data.key == key) {
       current_node->data.value = val;

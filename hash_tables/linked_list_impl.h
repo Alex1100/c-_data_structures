@@ -22,18 +22,20 @@ void LinkedList<T, E, Y>::add_node(T key, E val, Y weight, Y heuristic){
     return;
   } else {
     node<T, E, Y> *current_node = this->head;
+    node<T, E, Y> *prev_node = this->head;
 
     while(current_node->next != NULL) {
+      prev_node = current_node;
       current_node = current_node->next;
     }
 
-    current_node->next = new node<T, E, Y>();
-    current_node->next->data.key = key;
-    current_node->next->data.value = val;
-    current_node->next->data.weight = weight;
-    current_node->next->data.heuristic = heuristic;
+    prev_node->next = new node<T, E, Y>();
+    prev_node->next->data.key = key;
+    prev_node->next->data.value = val;
+    prev_node->next->data.weight = weight;
+    prev_node->next->data.heuristic = heuristic;
 
-    this->tail = current_node->next;
+    this->tail = prev_node->next;
     this->size++;
     return;
   }
@@ -45,13 +47,13 @@ bool LinkedList<T, E, Y>::contains(T key) {
     return false;
   }
 
-  node<T, E, Y> *current_node = this->head;
+  node<T, E, Y> *current_node = get_head();
 
   if (current_node->data.key == key) {
     return true;
   }
 
-  while(current_node->next != NULL) {
+  while(current_node != NULL) {
     if (current_node->data.key == key) {
       return true;
     }
@@ -63,7 +65,7 @@ bool LinkedList<T, E, Y>::contains(T key) {
 
 template <class T, class E, class Y>
 node<T, E, Y> *LinkedList<T, E, Y>::get_head() {
-  return head;
+  return this->head;
 }
 
 template <class T, class E, class Y>

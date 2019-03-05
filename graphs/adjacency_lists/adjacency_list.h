@@ -39,6 +39,7 @@ public:
   HashTable<T, T, U> *remove_vertex(T vertex);
   bool has_vertex(T vertex);
   bool has_edge(T from, T to);
+  bool has_edges(T from, T to);
   bool same_vertexes(T from, T to);
   bool has_all_edges(T from, T to);
   int cost_length(T from, T to);
