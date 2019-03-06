@@ -24,7 +24,7 @@ void LinkedList<T, E, Y>::add_node(T key, E val, Y weight, Y heuristic){
     node<T, E, Y> *current_node = this->head;
     node<T, E, Y> *prev_node = this->head;
 
-    while(current_node->next != NULL) {
+    while(current_node != NULL) {
       prev_node = current_node;
       current_node = current_node->next;
     }
