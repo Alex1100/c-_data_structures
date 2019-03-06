@@ -82,9 +82,12 @@ void AdjacencyList<T, U>::remove_edges(T from, T to) {
   if (!from_found || !to_found) {
     throw runtime_error("One or more Vertexes not found in the graph.");
   }
-
-  adjacency_list->get_storage()[adjacency_list->hash(from)].remove_node(to);
-  adjacency_list->get_storage()[adjacency_list->hash(to)].remove_node(from);
+  try {
+    node<T, T, U> *removed_from_node = adjacency_list->get_storage()[adjacency_list->hash(from)].remove_node(to);
+    node<T, T, U> *removed_to_node = adjacency_list->get_storage()[adjacency_list->hash(to)].remove_node(from);
+  } catch (const runtime_error& err) {
+    throw err;
+  }
 }
 
 template <class T, class U>
@@ -95,8 +98,11 @@ void AdjacencyList<T, U>::remove_edge(T from, T to) {
   if (!from_found || !to_found) {
     throw runtime_error("One or more Vertexes not found in the graph.");
   }
-
-  adjacency_list->get_storage()[adjacency_list->hash(from)].remove_node(to);
+  try {
+    node<T, T, U> *removed_from_node = adjacency_list->get_storage()[adjacency_list->hash(from)].remove_node(to);
+  } catch (const runtime_error& err) {
+    throw err;
+  }
 }
 
 template <class T, class U>
